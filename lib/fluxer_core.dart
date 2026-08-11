@@ -12,6 +12,7 @@ export 'src/guild_emoji.dart';
 export 'src/guild_member.dart';
 export 'src/guild_role.dart';
 export 'src/guild_sticker.dart';
+export 'src/invite.dart';
 export 'src/message.dart';
 export 'src/permissions.dart';
 export 'src/snowflake.dart';
