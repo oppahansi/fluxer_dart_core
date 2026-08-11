@@ -10,6 +10,8 @@ void main() {
         'icon': null,
         'owner_id': '901',
         'member_count': 42,
+        'online_count': 7,
+        'vanity_url_code': 'my-guild',
         'roles': [
           {
             'id': '902',
@@ -28,6 +30,8 @@ void main() {
       expect(guild.name, 'Test Guild');
       expect(guild.ownerId, Snowflake.parse('901'));
       expect(guild.memberCount, 42);
+      expect(guild.onlineCount, 7);
+      expect(guild.vanityUrlCode, 'my-guild');
       expect(guild.roles, hasLength(1));
       expect(guild.roles.single.name, '@everyone');
       expect(
@@ -47,6 +51,8 @@ void main() {
 
       expect(guild.roles, isEmpty);
       expect(guild.memberCount, isNull);
+      expect(guild.onlineCount, isNull);
+      expect(guild.vanityUrlCode, isNull);
     });
   });
 }

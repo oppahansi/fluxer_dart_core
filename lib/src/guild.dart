@@ -13,6 +13,8 @@ final class Guild {
     required this.ownerId,
     required this.roles,
     required this.memberCount,
+    required this.onlineCount,
+    required this.vanityUrlCode,
   });
 
   /// Decodes the flat shape REST returns (`GuildResponse`): guild fields
@@ -26,6 +28,8 @@ final class Guild {
         .map((r) => GuildRole.fromJson(r as Map<String, dynamic>))
         .toList(growable: false),
     memberCount: json['member_count'] as int?,
+    onlineCount: json['online_count'] as int?,
+    vanityUrlCode: json['vanity_url_code'] as String?,
   );
 
   /// Decodes the `GUILD_CREATE`/READY gateway dispatch shape
@@ -47,6 +51,11 @@ final class Guild {
   final Snowflake ownerId;
   final List<GuildRole> roles;
   final int? memberCount;
+  final int? onlineCount;
+
+  /// The guild's custom invite code (`fluxer.app/i/<code>`), if the
+  /// `VANITY_URL` feature is enabled — `null` otherwise.
+  final String? vanityUrlCode;
 
   @override
   bool operator ==(Object other) => other is Guild && other.id == id;
