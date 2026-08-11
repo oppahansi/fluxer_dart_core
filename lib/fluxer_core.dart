@@ -5,6 +5,7 @@ library;
 export 'src/channel.dart';
 export 'src/channel_type.dart';
 export 'src/exceptions.dart';
+export 'src/gateway_bot_info.dart';
 export 'src/guild.dart';
 export 'src/guild_role.dart';
 export 'src/message.dart';
