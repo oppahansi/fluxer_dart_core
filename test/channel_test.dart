@@ -133,4 +133,29 @@ void main() {
       },
     );
   });
+
+  group('Channel.guildId', () {
+    test('is null for a DM channel', () {
+      final channel = Channel.fromJson({
+        'id': '1',
+        'type': 1,
+        'recipients': <dynamic>[],
+        'last_message_id': null,
+      });
+
+      expect(channel.guildId, isNull);
+    });
+
+    test('unifies guild-scoped variants behind one getter', () {
+      final channel = Channel.fromJson({
+        'id': '111',
+        'type': 4,
+        'name': 'Text Channels',
+        'guild_id': '222',
+        'position': 0,
+      });
+
+      expect(channel.guildId, Snowflake.parse('222'));
+    });
+  });
 }

@@ -77,6 +77,18 @@ sealed class Channel {
   final ChannelType? type;
   final String? name;
 
+  /// The guild this channel belongs to, or `null` for a channel kind
+  /// with no guild (a DM or group DM). Every guild-scoped variant
+  /// carries its own `guildId` field; this just unifies them behind one
+  /// getter so callers that only care "is this guild-scoped, and if so
+  /// which one" don't need their own exhaustive `switch`.
+  Snowflake? get guildId => switch (this) {
+    GuildTextChannel(:final guildId) => guildId,
+    GuildVoiceChannel(:final guildId) => guildId,
+    GuildCategoryChannel(:final guildId) => guildId,
+    DmChannel() || GroupDmChannel() || UnknownChannel() => null,
+  };
+
   Map<String, dynamic> toJson();
 }
 
@@ -100,6 +112,7 @@ final class GuildTextChannel extends Channel {
     required this.rateLimitPerUser,
   }) : super(type: ChannelType.guildText);
 
+  @override
   final Snowflake guildId;
   final String? topic;
   final int position;
@@ -161,6 +174,7 @@ final class GuildVoiceChannel extends Channel {
     required this.rtcRegion,
   }) : super(type: ChannelType.guildVoice);
 
+  @override
   final Snowflake guildId;
   final int position;
   final Snowflake? parentId;
@@ -229,6 +243,7 @@ final class GuildCategoryChannel extends Channel {
     required this.position,
   }) : super(type: ChannelType.guildCategory);
 
+  @override
   final Snowflake guildId;
   final int position;
 
