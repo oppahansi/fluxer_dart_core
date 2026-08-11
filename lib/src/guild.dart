@@ -16,6 +16,8 @@ final class Guild {
     required this.memberCount,
   });
 
+  /// Decodes the flat shape REST returns (`GuildResponse`): guild fields
+  /// live directly on [json].
   factory Guild.fromJson(Map<String, dynamic> json) => Guild(
     id: Snowflake.parse(json['id'] as String),
     name: json['name'] as String,
@@ -26,6 +28,21 @@ final class Guild {
         .toList(growable: false),
     memberCount: json['member_count'] as int?,
   );
+
+  /// Decodes the `GUILD_CREATE`/READY gateway dispatch shape
+  /// (`GuildReadyData` in the reference client), which is *not* flat like
+  /// [fromJson]'s REST shape — guild fields (name, icon, owner_id, ...)
+  /// are nested under a `properties` object, sibling to `id`, `roles`,
+  /// and `member_count` at the top level. Found by actually running this
+  /// against a live instance: `Guild.fromJson` crashed on a null
+  /// `owner_id` because it isn't at the top level in this payload at all.
+  factory Guild.fromGuildCreateJson(Map<String, dynamic> json) =>
+      Guild.fromJson({
+        ...(json['properties'] as Map<String, dynamic>? ?? const {}),
+        'id': json['id'],
+        'roles': json['roles'],
+        'member_count': json['member_count'],
+      });
 
   final Snowflake id;
   final String name;
