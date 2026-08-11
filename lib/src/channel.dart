@@ -8,12 +8,13 @@ import 'snowflake.dart';
 /// handle it, rather than a silent runtime gap. Modeled after
 /// `ChannelResponse` in Fluxer's OpenAPI spec.
 ///
-/// M1 only distinguishes the two channel shapes the "hello gateway" slice
-/// actually needs ([GuildTextChannel], [DmChannel]); every other known
-/// type (voice, group DM, category, ...) decodes to [UnknownChannel]
+/// M1 only distinguished [GuildTextChannel] and [DmChannel]; M2 added
+/// [GuildVoiceChannel], [GroupDmChannel], and [GuildCategoryChannel].
+/// [ChannelType.guildLink] and [ChannelType.dmPersonalNotes] (both
+/// Fluxer-specific, low-traffic types) and anything this version of
+/// `fluxer_core` has never seen at all still decode to [UnknownChannel]
 /// rather than throwing, so messages arriving in channel kinds we haven't
-/// modeled yet don't take the whole gateway connection down. Broadened in
-/// M2.
+/// modeled yet don't take the whole gateway connection down.
 sealed class Channel {
   const Channel({required this.id, required this.type, required this.name});
 
@@ -45,15 +46,37 @@ sealed class Channel {
       ),
       ChannelType.dm => DmChannel(
         id: id,
-        recipientIds: ((json['recipients'] as List<dynamic>?) ?? const [])
-            .map(
-              (r) =>
-                  Snowflake.parse((r as Map<String, dynamic>)['id'] as String),
-            )
-            .toList(growable: false),
+        recipientIds: _recipientIds(json),
         lastMessageId: (json['last_message_id'] as String?).let(
           Snowflake.parse,
         ),
+      ),
+      ChannelType.guildVoice => GuildVoiceChannel(
+        id: id,
+        name: name!,
+        guildId: Snowflake.parse(json['guild_id'] as String),
+        position: json['position'] as int? ?? 0,
+        parentId: (json['parent_id'] as String?).let(Snowflake.parse),
+        bitrate: json['bitrate'] as int?,
+        userLimit: json['user_limit'] as int?,
+        voiceConnectionLimit: json['voice_connection_limit'] as int?,
+        rtcRegion: json['rtc_region'] as String?,
+      ),
+      ChannelType.groupDm => GroupDmChannel(
+        id: id,
+        name: name,
+        icon: json['icon'] as String?,
+        ownerId: (json['owner_id'] as String?).let(Snowflake.parse),
+        recipientIds: _recipientIds(json),
+        lastMessageId: (json['last_message_id'] as String?).let(
+          Snowflake.parse,
+        ),
+      ),
+      ChannelType.guildCategory => GuildCategoryChannel(
+        id: id,
+        name: name!,
+        guildId: Snowflake.parse(json['guild_id'] as String),
+        position: json['position'] as int? ?? 0,
       ),
       _ => UnknownChannel(id: id, type: type, rawType: rawType, name: name),
     };
@@ -65,6 +88,13 @@ sealed class Channel {
 
   Map<String, dynamic> toJson();
 }
+
+List<Snowflake> _recipientIds(Map<String, dynamic> json) =>
+    ((json['recipients'] as List<dynamic>?) ?? const [])
+        .map(
+          (r) => Snowflake.parse((r as Map<String, dynamic>)['id'] as String),
+        )
+        .toList(growable: false);
 
 final class GuildTextChannel extends Channel {
   const GuildTextChannel({
@@ -127,11 +157,108 @@ final class DmChannel extends Channel {
   String toString() => 'DmChannel($id)';
 }
 
-/// A channel of a known-but-not-yet-modeled type (voice, group DM,
-/// category, ...), or of a type this version of `fluxer_core` has never
-/// seen at all. Carries [rawType] so callers that need it can still branch
-/// on the raw integer while a proper variant is added in a later
-/// milestone.
+final class GuildVoiceChannel extends Channel {
+  const GuildVoiceChannel({
+    required super.id,
+    required String super.name,
+    required this.guildId,
+    required this.position,
+    required this.parentId,
+    required this.bitrate,
+    required this.userLimit,
+    required this.voiceConnectionLimit,
+    required this.rtcRegion,
+  }) : super(type: ChannelType.guildVoice);
+
+  final Snowflake guildId;
+  final int position;
+  final Snowflake? parentId;
+  final int? bitrate;
+  final int? userLimit;
+  final int? voiceConnectionLimit;
+
+  /// `null` means automatic region selection.
+  final String? rtcRegion;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'id': id.toJson(),
+    'type': ChannelType.guildVoice.value,
+    'name': name,
+    'guild_id': guildId.toJson(),
+    'position': position,
+    'parent_id': parentId?.toJson(),
+    'bitrate': bitrate,
+    'user_limit': userLimit,
+    'voice_connection_limit': voiceConnectionLimit,
+    'rtc_region': rtcRegion,
+  };
+
+  @override
+  String toString() => 'GuildVoiceChannel($id, #$name)';
+}
+
+final class GroupDmChannel extends Channel {
+  const GroupDmChannel({
+    required super.id,
+    required super.name,
+    required this.icon,
+    required this.ownerId,
+    required this.recipientIds,
+    required this.lastMessageId,
+  }) : super(type: ChannelType.groupDm);
+
+  final String? icon;
+
+  /// The member who created (and can manage) this group DM.
+  final Snowflake? ownerId;
+  final List<Snowflake> recipientIds;
+  final Snowflake? lastMessageId;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'id': id.toJson(),
+    'type': ChannelType.groupDm.value,
+    'name': name,
+    'icon': icon,
+    'owner_id': ownerId?.toJson(),
+    'recipients': recipientIds.map((r) => {'id': r.toJson()}).toList(),
+    'last_message_id': lastMessageId?.toJson(),
+  };
+
+  @override
+  String toString() => 'GroupDmChannel($id, $name)';
+}
+
+final class GuildCategoryChannel extends Channel {
+  const GuildCategoryChannel({
+    required super.id,
+    required String super.name,
+    required this.guildId,
+    required this.position,
+  }) : super(type: ChannelType.guildCategory);
+
+  final Snowflake guildId;
+  final int position;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'id': id.toJson(),
+    'type': ChannelType.guildCategory.value,
+    'name': name,
+    'guild_id': guildId.toJson(),
+    'position': position,
+  };
+
+  @override
+  String toString() => 'GuildCategoryChannel($id, $name)';
+}
+
+/// A channel of a known-but-not-yet-modeled type ([ChannelType.guildLink],
+/// [ChannelType.dmPersonalNotes]), or of a type this version of
+/// `fluxer_core` has never seen at all. Carries [rawType] so callers that
+/// need it can still branch on the raw integer while a proper variant is
+/// added in a later milestone.
 final class UnknownChannel extends Channel {
   const UnknownChannel({
     required super.id,
