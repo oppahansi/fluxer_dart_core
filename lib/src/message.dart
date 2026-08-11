@@ -5,7 +5,7 @@ import 'user.dart';
 /// (`export const MessageFlags`) in the Fluxer source. Deliberately small —
 /// unlike [PermissionFlag][], Fluxer only has four of these right now.
 ///
-/// [PermissionFlag]: package:fluxer_core/src/permissions.dart
+/// [PermissionFlag]: package:fluxer_dart_core/src/permissions.dart
 enum MessageFlag {
   suppressEmbeds(1 << 2),
   suppressNotifications(1 << 12),

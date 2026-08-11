@@ -1,5 +1,5 @@
 /// Domain models, enums, the Snowflake ID type, the Permissions bitfield,
-/// and the shared exception hierarchy for the fluxer.dart ecosystem.
+/// and the shared exception hierarchy for the fluxer_dart ecosystem.
 library;
 
 export 'src/channel.dart';

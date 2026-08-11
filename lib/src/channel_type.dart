@@ -21,7 +21,7 @@ enum ChannelType {
       (throw ArgumentError('Unknown ChannelType: $value'));
 
   /// Like [fromValue], but `null` instead of throwing for a value this
-  /// version of `fluxer_core` doesn't recognize — the usual case at
+  /// version of `fluxer_dart_core` doesn't recognize — the usual case at
   /// call sites that already have their own fallback (e.g.
   /// [UnknownChannel]) rather than wanting a thrown error.
   static ChannelType? tryFromValue(int value) {

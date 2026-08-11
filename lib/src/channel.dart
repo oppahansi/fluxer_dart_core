@@ -10,7 +10,7 @@ import 'snowflake.dart';
 ///
 /// [ChannelType.guildLink] and [ChannelType.dmPersonalNotes] (both
 /// Fluxer-specific, low-traffic types), along with any type this version
-/// of `fluxer_core` doesn't recognize at all, decode to [UnknownChannel]
+/// of `fluxer_dart_core` doesn't recognize at all, decode to [UnknownChannel]
 /// rather than throwing.
 sealed class Channel {
   const Channel({required this.id, required this.type, required this.name});
@@ -247,7 +247,7 @@ final class GuildCategoryChannel extends Channel {
 
 /// A channel of a known-but-unmodeled type ([ChannelType.guildLink],
 /// [ChannelType.dmPersonalNotes]), or of a type this version of
-/// `fluxer_core` doesn't recognize at all. Carries [rawType] so callers
+/// `fluxer_dart_core` doesn't recognize at all. Carries [rawType] so callers
 /// can still branch on the raw integer.
 final class UnknownChannel extends Channel {
   const UnknownChannel({

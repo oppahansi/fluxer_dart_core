@@ -1,13 +1,13 @@
-# fluxer_core
+# fluxer_dart_core
 
 Domain models, enums, the `Snowflake` ID type, the `Permissions` bitfield,
 and the shared exception hierarchy for the
-[fluxer.dart](https://github.com/oppahansi/fluxer.dart) ecosystem.
+[fluxer_dart](https://github.com/oppahansi/fluxer_dart) ecosystem.
 
 Pure data, zero I/O — this package doesn't know how to talk to Fluxer's REST
 API or gateway, only how to represent what comes back from them. See
-[`fluxer_rest`](https://github.com/oppahansi/fluxer_rest) and
-[`fluxer_gateway`](https://github.com/oppahansi/fluxer_gateway) for that.
+[`fluxer_dart_rest`](https://github.com/oppahansi/fluxer_dart_rest) and
+[`fluxer_dart_gateway`](https://github.com/oppahansi/fluxer_dart_gateway) for that.
 
 Every field on every model here was verified against Fluxer's own OpenAPI
 spec (`api.fluxer.app/openapi.json`) and, where the spec didn't have it (bit
@@ -34,19 +34,20 @@ nothing here is guessed.
   `FluxerGatewayException`.
 
 Audit log entries and embedding channels/emojis directly on `Guild`
-(currently fetched separately via `fluxer_rest`'s managers) aren't
+(currently fetched separately via `fluxer_dart_rest`'s managers) aren't
 modeled yet — see the roadmap in this ecosystem's planning docs.
 
-## Part of the fluxer.dart ecosystem
+## Part of the fluxer_dart ecosystem
 
 | Package | Purpose |
 |---|---|
-| [`fluxer_utils`](https://github.com/oppahansi/fluxer_utils) | generic building blocks |
-| [`fluxer_core`](https://github.com/oppahansi/fluxer_core) | *(this package)* domain models |
-| [`fluxer_rest`](https://github.com/oppahansi/fluxer_rest) | REST client |
-| [`fluxer_gateway`](https://github.com/oppahansi/fluxer_gateway) | WebSocket gateway client |
-| [`fluxer.dart`](https://github.com/oppahansi/fluxer.dart) | main framework — the `Bot` facade |
-| [`fluxer.dart-bot`](https://github.com/oppahansi/fluxer.dart-bot) | example bot |
+| [`fluxer_dart_utils`](https://github.com/oppahansi/fluxer_dart_utils) | generic building blocks |
+| [`fluxer_dart_core`](https://github.com/oppahansi/fluxer_dart_core) | *(this package)* domain models |
+| [`fluxer_dart_rest`](https://github.com/oppahansi/fluxer_dart_rest) | REST client |
+| [`fluxer_dart_gateway`](https://github.com/oppahansi/fluxer_dart_gateway) | WebSocket gateway client |
+| [`fluxer_dart_voice`](https://github.com/oppahansi/fluxer_dart_voice) | voice support |
+| [`fluxer_dart`](https://github.com/oppahansi/fluxer_dart) | main framework — the `Bot` facade |
+| [`fluxer_dart_bot`](https://github.com/oppahansi/fluxer_dart_bot) | example bot |
 
 ## Installation
 
@@ -55,9 +56,9 @@ git dependency:
 
 ```yaml
 dependencies:
-  fluxer_core:
+  fluxer_dart_core:
     git:
-      url: https://github.com/oppahansi/fluxer_core.git
+      url: https://github.com/oppahansi/fluxer_dart_core.git
 ```
 
 ## License

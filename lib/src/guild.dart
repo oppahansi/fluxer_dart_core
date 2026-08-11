@@ -3,7 +3,7 @@ import 'snowflake.dart';
 
 /// A Fluxer guild. Modeled after `GuildResponse` in Fluxer's OpenAPI spec:
 /// identity, ownership, and roles. Channels, emojis, and stickers are
-/// fetched separately via `fluxer_rest`'s managers rather than embedded
+/// fetched separately via `fluxer_dart_rest`'s managers rather than embedded
 /// here.
 final class Guild {
   const Guild({

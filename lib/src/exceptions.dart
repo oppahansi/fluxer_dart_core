@@ -1,4 +1,4 @@
-/// Base of every exception thrown by the fluxer.dart ecosystem.
+/// Base of every exception thrown by the fluxer_dart ecosystem.
 ///
 /// Sealed so callers can exhaustively `switch` over the concrete subtypes
 /// instead of guessing at string-typed error codes.
@@ -11,7 +11,7 @@ sealed class FluxerException implements Exception {
   String toString() => '$runtimeType: $message';
 }
 
-/// A REST API call failed. Thrown by `fluxer_rest`.
+/// A REST API call failed. Thrown by `fluxer_dart_rest`.
 final class FluxerApiException extends FluxerException {
   const FluxerApiException(
     super.message, {
@@ -37,7 +37,7 @@ final class FluxerApiException extends FluxerException {
 }
 
 /// The gateway connection failed or was closed with an error. Thrown by
-/// `fluxer_gateway`.
+/// `fluxer_dart_gateway`.
 final class FluxerGatewayException extends FluxerException {
   const FluxerGatewayException(super.message, {this.closeCode});
 

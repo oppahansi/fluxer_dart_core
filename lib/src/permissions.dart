@@ -55,7 +55,7 @@ enum PermissionFlag {
 /// A permission bitfield, as attached to a [GuildRole][] or computed for a
 /// member in a channel.
 ///
-/// [GuildRole]: package:fluxer_core/src/guild_role.dart
+/// [GuildRole]: package:fluxer_dart_core/src/guild_role.dart
 final class Permissions {
   const Permissions(this.raw);
 
