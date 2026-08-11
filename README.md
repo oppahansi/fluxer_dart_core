@@ -14,7 +14,7 @@ spec (`api.fluxer.app/openapi.json`) and, where the spec didn't have it (bit
 values, the snowflake epoch), against `fluxerapp/fluxer`'s source directly —
 nothing here is guessed.
 
-## What's here (v0.1 — M1 slice)
+## What's here
 
 - `Snowflake` — a zero-cost extension type over `int` wrapping Fluxer's
   64-bit snowflake ID format (epoch `1420070400000`ms, 42-bit timestamp /
@@ -24,15 +24,18 @@ nothing here is guessed.
   object rather than raw ints scattered through call sites.
 - `ChannelType` — `guildText`, `dm`, `guildVoice`, `groupDm`,
   `guildCategory`, `guildLink`, `dmPersonalNotes`.
-- Models: `User`, `Message`, `GuildRole`, `Guild`, and a sealed `Channel`
-  hierarchy (`GuildTextChannel`, `DmChannel`, `UnknownChannel` as a
-  forward-compatible fallback for channel types not yet modeled).
+- Models: `User`, `Message`, `GuildRole`, `GuildMember`, `GuildEmoji`,
+  `GuildSticker`, `GuildBan`, `Webhook`, `Invite`, `Guild`, and a sealed
+  `Channel` hierarchy (`GuildTextChannel`, `DmChannel`,
+  `GuildVoiceChannel`, `GroupDmChannel`, `GuildCategoryChannel`,
+  `UnknownChannel` as a forward-compatible fallback for channel types not
+  yet modeled).
 - `FluxerException` sealed hierarchy: `FluxerApiException`,
   `FluxerGatewayException`.
 
-Broader model coverage (emojis, stickers, webhooks, full role/member
-surface, voice states, ...) lands in M2 — see the roadmap in this
-ecosystem's planning docs.
+Audit log entries and embedding channels/emojis directly on `Guild`
+(currently fetched separately via `fluxer_rest`'s managers) aren't
+modeled yet — see the roadmap in this ecosystem's planning docs.
 
 ## Part of the fluxer.dart ecosystem
 
