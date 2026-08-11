@@ -20,13 +20,7 @@ sealed class Channel {
 
   factory Channel.fromJson(Map<String, dynamic> json) {
     final rawType = json['type'] as int;
-    ChannelType? type;
-    for (final candidate in ChannelType.values) {
-      if (candidate.value == rawType) {
-        type = candidate;
-        break;
-      }
-    }
+    final type = ChannelType.tryFromValue(rawType);
     final id = Snowflake.parse(json['id'] as String);
     final name = json['name'] as String?;
 
