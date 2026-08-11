@@ -17,6 +17,7 @@ export 'src/guild_sticker.dart';
 export 'src/invite.dart';
 export 'src/message.dart';
 export 'src/message_reference.dart';
+export 'src/permission_overwrite.dart';
 export 'src/permissions.dart';
 export 'src/reaction_emoji.dart';
 export 'src/snowflake.dart';
