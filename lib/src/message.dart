@@ -1,3 +1,6 @@
+import 'attachment.dart';
+import 'embed.dart';
+import 'message_reference.dart';
 import 'snowflake.dart';
 import 'user.dart';
 
@@ -18,8 +21,9 @@ enum MessageFlag {
 }
 
 /// A Fluxer message. Modeled after `MessageResponseSchema` in Fluxer's
-/// OpenAPI spec: covers plain text content. Embeds, attachments,
-/// reactions, and message references are not yet modeled.
+/// OpenAPI spec: text content, embeds, attachments, and message
+/// references. Reactions and sticker items on an incoming message aren't
+/// modeled yet — nothing reads them so far.
 final class Message {
   const Message({
     required this.id,
@@ -35,6 +39,10 @@ final class Message {
     required this.tts,
     required this.mentions,
     required this.mentionRoleIds,
+    this.embeds = const [],
+    this.attachments = const [],
+    this.messageReference,
+    this.referencedMessage,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
@@ -57,6 +65,17 @@ final class Message {
     mentionRoleIds: (json['mention_roles'] as List<dynamic>)
         .map((r) => Snowflake.parse(r as String))
         .toList(growable: false),
+    embeds: (json['embeds'] as List<dynamic>? ?? const [])
+        .map((e) => Embed.fromJson(e as Map<String, dynamic>))
+        .toList(growable: false),
+    attachments: (json['attachments'] as List<dynamic>? ?? const [])
+        .map((a) => Attachment.fromJson(a as Map<String, dynamic>))
+        .toList(growable: false),
+    messageReference: (json['message_reference'] as Map<String, dynamic>?)?.let(
+      MessageReference.fromJson,
+    ),
+    referencedMessage: (json['referenced_message'] as Map<String, dynamic>?)
+        ?.let(Message.fromJson),
   );
 
   final Snowflake id;
@@ -72,6 +91,13 @@ final class Message {
   final bool tts;
   final List<User> mentions;
   final List<Snowflake> mentionRoleIds;
+  final List<Embed> embeds;
+  final List<Attachment> attachments;
+  final MessageReference? messageReference;
+
+  /// The full replied-to message, present when Fluxer resolves it inline
+  /// rather than leaving the caller to fetch [messageReference] itself.
+  final Message? referencedMessage;
 
   bool hasFlag(MessageFlag flag) => flags & flag.bit == flag.bit;
 
@@ -83,4 +109,11 @@ final class Message {
 
   @override
   String toString() => 'Message($id, from ${author.username}: "$content")';
+}
+
+extension _Let<T> on T? {
+  R? let<R>(R Function(T) f) {
+    final self = this;
+    return self == null ? null : f(self);
+  }
 }

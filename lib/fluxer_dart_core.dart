@@ -2,8 +2,10 @@
 /// and the shared exception hierarchy for the fluxer_dart ecosystem.
 library;
 
+export 'src/attachment.dart';
 export 'src/channel.dart';
 export 'src/channel_type.dart';
+export 'src/embed.dart';
 export 'src/exceptions.dart';
 export 'src/gateway_bot_info.dart';
 export 'src/guild.dart';
@@ -14,6 +16,7 @@ export 'src/guild_role.dart';
 export 'src/guild_sticker.dart';
 export 'src/invite.dart';
 export 'src/message.dart';
+export 'src/message_reference.dart';
 export 'src/permissions.dart';
 export 'src/reaction_emoji.dart';
 export 'src/snowflake.dart';
