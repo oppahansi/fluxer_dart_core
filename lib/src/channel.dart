@@ -8,13 +8,10 @@ import 'snowflake.dart';
 /// handle it, rather than a silent runtime gap. Modeled after
 /// `ChannelResponse` in Fluxer's OpenAPI spec.
 ///
-/// M1 only distinguished [GuildTextChannel] and [DmChannel]; M2 added
-/// [GuildVoiceChannel], [GroupDmChannel], and [GuildCategoryChannel].
 /// [ChannelType.guildLink] and [ChannelType.dmPersonalNotes] (both
-/// Fluxer-specific, low-traffic types) and anything this version of
-/// `fluxer_core` has never seen at all still decode to [UnknownChannel]
-/// rather than throwing, so messages arriving in channel kinds we haven't
-/// modeled yet don't take the whole gateway connection down.
+/// Fluxer-specific, low-traffic types), along with any type this version
+/// of `fluxer_core` doesn't recognize at all, decode to [UnknownChannel]
+/// rather than throwing.
 sealed class Channel {
   const Channel({required this.id, required this.type, required this.name});
 
@@ -248,11 +245,10 @@ final class GuildCategoryChannel extends Channel {
   String toString() => 'GuildCategoryChannel($id, $name)';
 }
 
-/// A channel of a known-but-not-yet-modeled type ([ChannelType.guildLink],
+/// A channel of a known-but-unmodeled type ([ChannelType.guildLink],
 /// [ChannelType.dmPersonalNotes]), or of a type this version of
-/// `fluxer_core` has never seen at all. Carries [rawType] so callers that
-/// need it can still branch on the raw integer while a proper variant is
-/// added in a later milestone.
+/// `fluxer_core` doesn't recognize at all. Carries [rawType] so callers
+/// can still branch on the raw integer.
 final class UnknownChannel extends Channel {
   const UnknownChannel({
     required super.id,

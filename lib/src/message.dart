@@ -18,9 +18,8 @@ enum MessageFlag {
 }
 
 /// A Fluxer message. Modeled after `MessageResponseSchema` in Fluxer's
-/// OpenAPI spec — M1 covers the fields needed to receive and reply to a
-/// plain text message; embeds, attachments, reactions, and message
-/// references land in M2.
+/// OpenAPI spec: covers plain text content. Embeds, attachments,
+/// reactions, and message references are not yet modeled.
 final class Message {
   const Message({
     required this.id,

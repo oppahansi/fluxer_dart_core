@@ -1,11 +1,10 @@
 import 'guild_role.dart';
 import 'snowflake.dart';
 
-/// A Fluxer guild. Modeled after `GuildResponse` in Fluxer's OpenAPI spec —
-/// M1 covers identity, ownership, and roles; channels/emojis/stickers are
-/// fetched separately via `fluxer_rest` for now rather than embedded here,
-/// and land as embedded fields in M2 once `fluxer_rest` has managers for
-/// them.
+/// A Fluxer guild. Modeled after `GuildResponse` in Fluxer's OpenAPI spec:
+/// identity, ownership, and roles. Channels, emojis, and stickers are
+/// fetched separately via `fluxer_rest`'s managers rather than embedded
+/// here.
 final class Guild {
   const Guild({
     required this.id,
@@ -33,9 +32,7 @@ final class Guild {
   /// (`GuildReadyData` in the reference client), which is *not* flat like
   /// [fromJson]'s REST shape — guild fields (name, icon, owner_id, ...)
   /// are nested under a `properties` object, sibling to `id`, `roles`,
-  /// and `member_count` at the top level. Found by actually running this
-  /// against a live instance: `Guild.fromJson` crashed on a null
-  /// `owner_id` because it isn't at the top level in this payload at all.
+  /// and `member_count` at the top level.
   factory Guild.fromGuildCreateJson(Map<String, dynamic> json) =>
       Guild.fromJson({
         ...(json['properties'] as Map<String, dynamic>? ?? const {}),

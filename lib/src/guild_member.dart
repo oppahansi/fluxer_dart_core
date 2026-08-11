@@ -2,8 +2,8 @@ import 'snowflake.dart';
 import 'user.dart';
 
 /// A guild member. Modeled after `GuildMemberResponse` in Fluxer's
-/// OpenAPI spec — confirmed against a live instance's
-/// `GET /guilds/{id}/members` response during M1.
+/// OpenAPI spec, confirmed against a live instance's
+/// `GET /guilds/{id}/members` response.
 final class GuildMember {
   const GuildMember({
     required this.user,

@@ -5,7 +5,7 @@ import 'snowflake.dart';
 /// Modeled after `UserPartialResponse` in Fluxer's OpenAPI spec — the
 /// partial/public shape returned alongside other resources, as opposed to
 /// the fuller `UserPrivateResponse` shape only the authenticated user sees
-/// about themselves (not yet modeled here, see roadmap M2).
+/// about themselves (not modeled here).
 final class User {
   const User({
     required this.id,

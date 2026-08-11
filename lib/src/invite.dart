@@ -2,11 +2,9 @@ import 'snowflake.dart';
 import 'user.dart';
 
 /// An invite. Modeled after `GuildInviteResponse` in Fluxer's OpenAPI
-/// spec — deliberately not embedding a full nested [Guild]/`Channel`
-/// (the spec itself leaves `guild` as an untyped `object` and `channel`
-/// as its own partial shape distinct from the full channel response), so
-/// this only pulls out the identity/name fields actually useful without
-/// a follow-up fetch.
+/// spec, which leaves `guild` as an untyped `object` and `channel` as its
+/// own partial shape distinct from the full channel response — this only
+/// pulls out the identity/name fields, not a full nested [Guild]/`Channel`.
 final class Invite {
   const Invite({
     required this.code,
