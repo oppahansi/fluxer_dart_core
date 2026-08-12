@@ -1,0 +1,158 @@
+import 'package:fluxer_dart_core/fluxer_dart_core.dart';
+import 'package:test/test.dart';
+
+Map<String, dynamic> _sampleUserJson({String id = '1'}) => {
+  'id': id,
+  'username': 'oppa',
+  'discriminator': '0',
+  'global_name': 'Oppa',
+  'avatar': null,
+  'avatar_color': null,
+  'bot': false,
+  'system': false,
+};
+
+Map<String, dynamic> _baseMessageJson({String id = '100'}) => {
+  'id': id,
+  'channel_id': '200',
+  'author': _sampleUserJson(),
+  'type': 0,
+  'flags': 0,
+  'content': 'hi',
+  'timestamp': '2026-08-11T12:00:00.000Z',
+  'edited_timestamp': null,
+  'pinned': false,
+  'mention_everyone': false,
+  'tts': false,
+  'mentions': <dynamic>[],
+  'mention_roles': <dynamic>[],
+};
+
+void main() {
+  group('Message.fromJson', () {
+    test('decodes a plain text message', () {
+      final message = Message.fromJson({
+        'id': '100',
+        'channel_id': '200',
+        'author': _sampleUserJson(),
+        'type': 0,
+        'flags': 0,
+        'content': '!ping',
+        'timestamp': '2026-08-11T12:00:00.000Z',
+        'edited_timestamp': null,
+        'pinned': false,
+        'mention_everyone': false,
+        'tts': false,
+        'mentions': <dynamic>[],
+        'mention_roles': <dynamic>[],
+      });
+
+      expect(message.id, Snowflake.parse('100'));
+      expect(message.channelId, Snowflake.parse('200'));
+      expect(message.author.username, 'oppa');
+      expect(message.content, '!ping');
+      expect(message.editedTimestamp, isNull);
+      expect(message.mentions, isEmpty);
+    });
+
+    test('decodes flags via hasFlag', () {
+      final message = Message.fromJson({
+        'id': '100',
+        'channel_id': '200',
+        'author': _sampleUserJson(),
+        'type': 0,
+        'flags': MessageFlag.voiceMessage.bit | MessageFlag.suppressEmbeds.bit,
+        'content': '',
+        'timestamp': '2026-08-11T12:00:00.000Z',
+        'edited_timestamp': null,
+        'pinned': false,
+        'mention_everyone': false,
+        'tts': false,
+        'mentions': <dynamic>[],
+        'mention_roles': <dynamic>[],
+      });
+
+      expect(message.hasFlag(MessageFlag.voiceMessage), isTrue);
+      expect(message.hasFlag(MessageFlag.suppressEmbeds), isTrue);
+      expect(message.hasFlag(MessageFlag.suppressNotifications), isFalse);
+    });
+
+    test('decodes mentions and mention role IDs', () {
+      final message = Message.fromJson({
+        'id': '100',
+        'channel_id': '200',
+        'author': _sampleUserJson(),
+        'type': 0,
+        'flags': 0,
+        'content': '@oppa hi',
+        'timestamp': '2026-08-11T12:00:00.000Z',
+        'edited_timestamp': null,
+        'pinned': false,
+        'mention_everyone': false,
+        'tts': false,
+        'mentions': [_sampleUserJson(id: '2')],
+        'mention_roles': ['300'],
+      });
+
+      expect(message.mentions.single.id, Snowflake.parse('2'));
+      expect(message.mentionRoleIds, [Snowflake.parse('300')]);
+    });
+
+    test('embeds/attachments default to empty when absent', () {
+      final message = Message.fromJson(_baseMessageJson());
+
+      expect(message.embeds, isEmpty);
+      expect(message.attachments, isEmpty);
+      expect(message.messageReference, isNull);
+      expect(message.referencedMessage, isNull);
+    });
+
+    test('decodes embeds', () {
+      final message = Message.fromJson({
+        ..._baseMessageJson(),
+        'embeds': [
+          {
+            'title': 'Title',
+            'description': 'Description',
+            'color': 0x00ff00,
+            'fields': [
+              {'name': 'f1', 'value': 'v1', 'inline': true},
+            ],
+          },
+        ],
+      });
+
+      expect(message.embeds.single.title, 'Title');
+      expect(message.embeds.single.color, 0x00ff00);
+      expect(message.embeds.single.fields.single.name, 'f1');
+    });
+
+    test('decodes attachments', () {
+      final message = Message.fromJson({
+        ..._baseMessageJson(),
+        'attachments': [
+          {
+            'id': '400',
+            'filename': 'cat.png',
+            'size': 1024,
+            'url': 'https://example.com/cat.png',
+          },
+        ],
+      });
+
+      expect(message.attachments.single.id, Snowflake.parse('400'));
+      expect(message.attachments.single.filename, 'cat.png');
+    });
+
+    test('decodes message_reference and the resolved referenced_message', () {
+      final message = Message.fromJson({
+        ..._baseMessageJson(id: '101'),
+        'message_reference': {'message_id': '100'},
+        'referenced_message': _baseMessageJson(),
+      });
+
+      expect(message.messageReference?.messageId, Snowflake.parse('100'));
+      expect(message.referencedMessage?.id, Snowflake.parse('100'));
+    });
+  });
+}
