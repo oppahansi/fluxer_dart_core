@@ -37,6 +37,18 @@ Audit log entries and embedding channels/emojis directly on `Guild`
 (currently fetched separately via `fluxer_dart_rest`'s managers) aren't
 modeled yet — see the roadmap in this ecosystem's planning docs.
 
+## Fluxer version
+
+Verified against Fluxer's REST API version `1.0.0` (the OpenAPI spec's
+own `info.version` field, at `api.fluxer.app/openapi.json`) and gateway
+protocol version `1` (the mandatory `?v=1` query param on the WebSocket
+URL), checked against a self-hosted instance running image tag `v1` as
+of 2026-08-12. Fluxer doesn't publish a versioning policy or changelog
+beyond that `info.version` field, so nothing here is guaranteed to track
+future platform changes automatically — re-check the live OpenAPI spec
+(and, for anything gateway-related, the reference client's source)
+before relying on identical behavior after Fluxer updates.
+
 ## Part of the fluxer_dart ecosystem
 
 | Package | Purpose |
