@@ -5,16 +5,32 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   analyze-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: fluxer_dart_core
+
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
+
       - run: dart pub get
+        working-directory: fluxer_dart_core
       - run: dart format --output=none --set-exit-if-changed .
+        working-directory: fluxer_dart_core
       - run: dart analyze --fatal-infos
+        working-directory: fluxer_dart_core
       - run: dart test
+        working-directory: fluxer_dart_core
