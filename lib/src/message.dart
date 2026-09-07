@@ -4,20 +4,42 @@ import 'message_reference.dart';
 import 'snowflake.dart';
 import 'user.dart';
 
-/// Message flags, verified against `packages/constants/src/ChannelConstants.ts`
-/// (`export const MessageFlags`) in the Fluxer source. Deliberately small —
-/// unlike [PermissionFlag][], Fluxer only has four of these right now.
+/// Per-message behaviour flags.
 ///
-/// [PermissionFlag]: package:fluxer_dart_core/src/permissions.dart
+/// Only [suppressEmbeds], [suppressNotifications] and [voiceMessage] can
+/// be set by a client on send; [compactAttachments] appears on incoming
+/// messages but is not accepted in a send or edit body.
 enum MessageFlag {
+  /// Serialise the message without its embeds, including any link
+  /// preview the server would otherwise generate.
   suppressEmbeds(1 << 2),
+
+  /// Deliver the message without a push or desktop notification.
   suppressNotifications(1 << 12),
+
   voiceMessage(1 << 13),
+
   compactAttachments(1 << 17);
 
   const MessageFlag(this.bit);
 
   final int bit;
+}
+
+/// A set of [MessageFlag]s, held as the integer bitfield the API uses.
+extension type const MessageFlags(int value) {
+  /// No flags set.
+  static const MessageFlags none = MessageFlags(0);
+
+  factory MessageFlags.of(Iterable<MessageFlag> flags) =>
+      MessageFlags(flags.fold(0, (bits, flag) => bits | flag.bit));
+
+  bool has(MessageFlag flag) => value & flag.bit == flag.bit;
+
+  MessageFlags operator |(MessageFlag flag) => MessageFlags(value | flag.bit);
+
+  /// The flags this bitfield names, ignoring any bit with no known flag.
+  Iterable<MessageFlag> get flags => MessageFlag.values.where(has);
 }
 
 /// A Fluxer message. Modeled after `MessageResponseSchema` in Fluxer's
@@ -116,4 +138,23 @@ extension _Let<T> on T? {
     final self = this;
     return self == null ? null : f(self);
   }
+}
+
+/// A message together with the time it was pinned.
+///
+/// Pin listings return this rather than a bare message, because the pin
+/// order is by pin time and that is not derivable from the message.
+final class PinnedMessage {
+  const PinnedMessage({required this.message, required this.pinnedAt});
+
+  factory PinnedMessage.fromJson(Map<String, dynamic> json) => PinnedMessage(
+    message: Message.fromJson(json['message'] as Map<String, dynamic>),
+    pinnedAt: DateTime.parse(json['pinned_at'] as String),
+  );
+
+  final Message message;
+  final DateTime pinnedAt;
+
+  @override
+  String toString() => 'PinnedMessage(${message.id} at $pinnedAt)';
 }

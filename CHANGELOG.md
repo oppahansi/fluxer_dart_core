@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.2.0
+
+- `Presence`, `PresenceStatus`, `CustomStatus` and `SessionPresence` for
+  publishing a session's presence and reading the account's live session
+  set.
+- `AllowedMentions` and `MentionType`, controlling which mentions in a
+  message notify anyone. `AllowedMentions.none` suppresses all of them,
+  which is the safe default when echoing user-supplied text.
+- `MessageFlags`, a set type over the existing `MessageFlag` enum.
+- The attachment upload types: `AttachmentUploadRequest`, the sealed
+  `AttachmentUploadTarget` (`AttachmentUploadSinglepart` /
+  `AttachmentUploadMultipart`), `AttachmentUploadPart` and
+  `UploadedAttachment`.
+- `InstanceDiscovery` and `InstanceEndpoints`, decoding a deployment's
+  `/.well-known/fluxer` document.
+- `Page<T>` for the `{items, has_more, next_after}` envelope the pinned
+  message and reaction user routes return.
+- `PinnedMessage`, pairing a message with the time it was pinned.
+- `GuildMemberSearchResult` and `GuildMemberSearchPage`. The search index
+  returns a flattened shape with a numeric `joined_at`, not the
+  `GuildMember` the member routes return.
+
 ## 0.1.0 — Initial release
 
 - `Snowflake` — a zero-cost extension type over `int` wrapping Fluxer's
