@@ -205,3 +205,34 @@ final class UploadedAttachment {
   @override
   String toString() => 'UploadedAttachment($filename)';
 }
+
+/// One attachment URL re-signed so it can be fetched again.
+///
+/// An attachment URL carries a signature that expires, so a URL stored
+/// from an earlier message eventually stops working. Refreshing takes the
+/// stored URL and returns the same URL with a current signature.
+final class RefreshedAttachmentUrl {
+  const RefreshedAttachmentUrl({
+    required this.original,
+    required this.refreshed,
+  });
+
+  factory RefreshedAttachmentUrl.fromJson(Map<String, dynamic> json) =>
+      RefreshedAttachmentUrl(
+        original: json['original'] as String,
+        refreshed: json['refreshed'] as String,
+      );
+
+  /// The requested URL, echoed back unchanged.
+  final String original;
+
+  /// The same URL with a fresh signature, or [original] unchanged when it
+  /// is not an attachment URL this deployment serves.
+  final String refreshed;
+
+  /// Whether the URL actually changed.
+  bool get wasRefreshed => refreshed != original;
+
+  @override
+  String toString() => 'RefreshedAttachmentUrl($original)';
+}

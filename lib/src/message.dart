@@ -7,12 +7,24 @@ import 'user.dart';
 /// Per-message behaviour flags.
 ///
 /// Only [suppressEmbeds], [suppressNotifications] and [voiceMessage] can
-/// be set by a client on send; [compactAttachments] appears on incoming
-/// messages but is not accepted in a send or edit body.
+/// be set by a client on send. The rest describe state the API sets
+/// itself and are rejected in a send or edit body.
 enum MessageFlag {
+  /// Set on an announcement-channel message that has been published to
+  /// following channels.
+  crossposted(1 << 0),
+
+  /// Set on a copy delivered to a channel that follows an announcement
+  /// channel.
+  isCrosspost(1 << 1),
+
   /// Serialise the message without its embeds, including any link
   /// preview the server would otherwise generate.
   suppressEmbeds(1 << 2),
+
+  /// Set on surviving copies once the published message they came from is
+  /// deleted. The copy stays in place as a placeholder.
+  sourceMessageDeleted(1 << 3),
 
   /// Deliver the message without a push or desktop notification.
   suppressNotifications(1 << 12),
@@ -42,6 +54,40 @@ extension type const MessageFlags(int value) {
   Iterable<MessageFlag> get flags => MessageFlag.values.where(has);
 }
 
+/// What produced a message.
+///
+/// Most messages are [default_]; the rest are system messages the API
+/// writes itself to narrate something that happened in the channel.
+enum MessageType {
+  default_(0),
+  recipientAdd(1),
+  recipientRemove(2),
+  call(3),
+  channelNameChange(4),
+  channelIconChange(5),
+  channelPinnedMessage(6),
+  userJoin(7),
+
+  /// Written into a channel when it starts following an announcement
+  /// channel.
+  channelFollowAdd(12),
+
+  reply(19);
+
+  const MessageType(this.value);
+
+  final int value;
+
+  /// `null` for a value this version does not recognise, which callers
+  /// handle through [Message.rawType] instead of a thrown error.
+  static MessageType? tryFromValue(int value) {
+    for (final candidate in values) {
+      if (candidate.value == value) return candidate;
+    }
+    return null;
+  }
+}
+
 /// A Fluxer message. Modeled after `MessageResponseSchema` in Fluxer's
 /// OpenAPI spec: text content, embeds, attachments, and message
 /// references. Reactions and sticker items on an incoming message aren't
@@ -51,7 +97,7 @@ final class Message {
     required this.id,
     required this.channelId,
     required this.author,
-    required this.type,
+    required this.rawType,
     required this.flags,
     required this.content,
     required this.timestamp,
@@ -71,8 +117,8 @@ final class Message {
     id: Snowflake.parse(json['id'] as String),
     channelId: Snowflake.parse(json['channel_id'] as String),
     author: User.fromJson(json['author'] as Map<String, dynamic>),
-    type: json['type'] as int,
-    flags: json['flags'] as int? ?? 0,
+    rawType: json['type'] as int,
+    flags: MessageFlags(json['flags'] as int? ?? 0),
     content: json['content'] as String,
     timestamp: DateTime.parse(json['timestamp'] as String),
     editedTimestamp: (json['edited_timestamp'] as String?) == null
@@ -103,8 +149,24 @@ final class Message {
   final Snowflake id;
   final Snowflake channelId;
   final User author;
-  final int type;
-  final int flags;
+
+  /// The wire value of [type], kept so a type this version does not model
+  /// is still readable.
+  final int rawType;
+
+  final MessageFlags flags;
+
+  /// What produced this message, or `null` for a type this version does
+  /// not model — see [rawType].
+  MessageType? get type => MessageType.tryFromValue(rawType);
+
+  /// Whether this message has been published to channels following its
+  /// announcement channel.
+  bool get isCrossposted => flags.has(MessageFlag.crossposted);
+
+  /// Whether this message is a copy delivered by following an
+  /// announcement channel rather than being sent here directly.
+  bool get isCrosspost => flags.has(MessageFlag.isCrosspost);
   final String content;
   final DateTime timestamp;
   final DateTime? editedTimestamp;
@@ -121,7 +183,7 @@ final class Message {
   /// rather than leaving the caller to fetch [messageReference] itself.
   final Message? referencedMessage;
 
-  bool hasFlag(MessageFlag flag) => flags & flag.bit == flag.bit;
+  bool hasFlag(MessageFlag flag) => flags.has(flag);
 
   @override
   bool operator ==(Object other) => other is Message && other.id == id;

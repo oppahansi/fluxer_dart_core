@@ -1,14 +1,14 @@
-/// Fluxer's channel type discriminant, verified against
-/// `packages/constants/src/ChannelConstants.ts` (`export const ChannelTypes`)
-/// in the Fluxer source. Notably smaller than Discord's equivalent enum —
-/// no announcement channels, threads, or stage channels — plus two
-/// Fluxer-specific types with deliberately high values.
+/// A channel's type discriminant.
+///
+/// There are no thread or stage types. [guildLink] and [dmPersonalNotes]
+/// carry deliberately high values, outside the contiguous range.
 enum ChannelType {
   guildText(0),
   dm(1),
   guildVoice(2),
   groupDm(3),
   guildCategory(4),
+  guildAnnouncement(5),
   guildLink(998),
   dmPersonalNotes(999);
 

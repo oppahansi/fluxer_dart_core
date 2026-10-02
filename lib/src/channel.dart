@@ -63,6 +63,19 @@ sealed class Channel {
           Snowflake.parse,
         ),
       ),
+      ChannelType.guildAnnouncement => GuildAnnouncementChannel(
+        id: id,
+        name: name!,
+        guildId: Snowflake.parse(json['guild_id'] as String),
+        topic: json['topic'] as String?,
+        position: json['position'] as int? ?? 0,
+        parentId: (json['parent_id'] as String?).let(Snowflake.parse),
+        lastMessageId: (json['last_message_id'] as String?).let(
+          Snowflake.parse,
+        ),
+        nsfw: json['nsfw'] as bool? ?? false,
+        rateLimitPerUser: json['rate_limit_per_user'] as int? ?? 0,
+      ),
       ChannelType.guildCategory => GuildCategoryChannel(
         id: id,
         name: name!,
@@ -84,6 +97,7 @@ sealed class Channel {
   /// which one" don't need their own exhaustive `switch`.
   Snowflake? get guildId => switch (this) {
     GuildTextChannel(:final guildId) => guildId,
+    GuildAnnouncementChannel(:final guildId) => guildId,
     GuildVoiceChannel(:final guildId) => guildId,
     GuildCategoryChannel(:final guildId) => guildId,
     DmChannel() || GroupDmChannel() || UnknownChannel() => null,
@@ -137,6 +151,52 @@ final class GuildTextChannel extends Channel {
 
   @override
   String toString() => 'GuildTextChannel($id, #$name)';
+}
+
+/// A guild channel whose messages can be published to channels in other
+/// guilds that follow it.
+///
+/// Carries the same shape as [GuildTextChannel] and behaves like one for
+/// sending; the difference is that a message in it can be crossposted,
+/// and other guilds can follow it to receive copies.
+final class GuildAnnouncementChannel extends Channel {
+  const GuildAnnouncementChannel({
+    required super.id,
+    required String super.name,
+    required this.guildId,
+    required this.topic,
+    required this.position,
+    required this.parentId,
+    required this.lastMessageId,
+    required this.nsfw,
+    required this.rateLimitPerUser,
+  }) : super(type: ChannelType.guildAnnouncement);
+
+  @override
+  final Snowflake guildId;
+  final String? topic;
+  final int position;
+  final Snowflake? parentId;
+  final Snowflake? lastMessageId;
+  final bool nsfw;
+  final int rateLimitPerUser;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'id': id.toJson(),
+    'type': ChannelType.guildAnnouncement.value,
+    'name': name,
+    'guild_id': guildId.toJson(),
+    'topic': topic,
+    'position': position,
+    'parent_id': parentId?.toJson(),
+    'last_message_id': lastMessageId?.toJson(),
+    'nsfw': nsfw,
+    'rate_limit_per_user': rateLimitPerUser,
+  };
+
+  @override
+  String toString() => 'GuildAnnouncementChannel($id, #$name)';
 }
 
 final class DmChannel extends Channel {

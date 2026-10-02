@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.3.0
+
+- **Fixed:** `Webhook.token` is now nullable. A channel follower webhook
+  carries no token, so decoding one threw and took down any call that
+  listed webhooks in a channel following an announcement channel.
+  `Webhook.isExecutable` reports whether it can be posted to.
+- **Fixed:** `MessageReference.messageId` is now nullable. A
+  `CHANNEL_FOLLOW_ADD` system message references the announcement channel
+  being followed and carries no message id, which threw while decoding
+  any message list containing one.
+- **Breaking:** `Message.type` is now a `MessageType?` and the wire value
+  moved to `Message.rawType`; `Message.flags` is now `MessageFlags`
+  rather than `int`. `Message.hasFlag` is unchanged.
+- `ChannelType.guildAnnouncement` and `GuildAnnouncementChannel`. Without
+  it an announcement channel decoded as `UnknownChannel`.
+- `MessageFlag` gained `crossposted`, `isCrosspost` and
+  `sourceMessageDeleted`, with `Message.isCrossposted` and
+  `Message.isCrosspost` reading the first two.
+- `MessageType` and `MessageReferenceType` enums, both now documented by
+  the API reference.
+- `WebhookType`, plus `Webhook.sourceChannel` and `Webhook.sourceGuild`
+  for channel follower webhooks.
+- `FollowedChannel`, `ChannelFollowerStats` and `CrosspostSource`.
+- `PartialChannel` and `PartialGuild`, for the places a payload names a
+  channel or guild it points at rather than embedding the resource.
+- `RefreshedAttachmentUrl`.
+
 ## 0.2.0
 
 - `Presence`, `PresenceStatus`, `CustomStatus` and `SessionPresence` for

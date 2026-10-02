@@ -26,8 +26,9 @@ nothing here is guessed.
   `guildCategory`, `guildLink`, `dmPersonalNotes`.
 - Models: `User`, `Message`, `GuildRole`, `GuildMember`, `GuildEmoji`,
   `GuildSticker`, `GuildBan`, `Webhook`, `Invite`, `Guild`, and a sealed
-  `Channel` hierarchy (`GuildTextChannel`, `DmChannel`,
-  `GuildVoiceChannel`, `GroupDmChannel`, `GuildCategoryChannel`,
+  `Channel` hierarchy (`GuildTextChannel`, `GuildAnnouncementChannel`,
+  `DmChannel`, `GuildVoiceChannel`, `GroupDmChannel`,
+  `GuildCategoryChannel`,
   `UnknownChannel` as a forward-compatible fallback for channel types not
   yet modeled).
 - `FluxerException` sealed hierarchy: `FluxerApiException`,
