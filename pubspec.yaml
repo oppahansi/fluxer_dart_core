@@ -3,7 +3,7 @@ description: >-
   Domain models, enums, the Snowflake ID type, the Permissions bitfield, and
   the shared exception hierarchy for the fluxer_dart ecosystem. Pure data —
   no networking.
-version: 0.3.0
+version: 0.4.0
 homepage: https://github.com/oppahansi/fluxer_dart_core
 repository: https://github.com/oppahansi/fluxer_dart_core
 

@@ -23,12 +23,13 @@ nothing here is guessed.
   (`CREATE_INSTANT_INVITE` through `VIEW_CHANNEL_MEMBERS`), as a value
   object rather than raw ints scattered through call sites.
 - `ChannelType` — `guildText`, `dm`, `guildVoice`, `groupDm`,
-  `guildCategory`, `guildLink`, `dmPersonalNotes`.
+  `guildCategory`, `guildAnnouncement`, the three thread types,
+  `guildForum`, `guildMedia`, `guildLink`, `dmPersonalNotes`.
 - Models: `User`, `Message`, `GuildRole`, `GuildMember`, `GuildEmoji`,
   `GuildSticker`, `GuildBan`, `Webhook`, `Invite`, `Guild`, and a sealed
   `Channel` hierarchy (`GuildTextChannel`, `GuildAnnouncementChannel`,
   `DmChannel`, `GuildVoiceChannel`, `GroupDmChannel`,
-  `GuildCategoryChannel`,
+  `GuildCategoryChannel`, `GuildForumChannel`, `ThreadChannel`,
   `UnknownChannel` as a forward-compatible fallback for channel types not
   yet modeled).
 - `FluxerException` sealed hierarchy: `FluxerApiException`,

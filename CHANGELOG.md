@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.4.0
+
+- Threads. `ChannelType` gained `announcementThread`, `publicThread` and
+  `privateThread`, with `ChannelType.isThread`, and the sealed `Channel`
+  hierarchy gained `ThreadChannel`. Without it a thread decoded as
+  `UnknownChannel`. `ThreadMetadata` holds the archive and lock state.
+- Forum and media channels: `ChannelType.guildForum` and `guildMedia`,
+  both decoding to `GuildForumChannel`, with `ForumTag` and `ChannelFlag`.
+- **Breaking for exhaustive switches:** a `switch` over `Channel` or
+  `ChannelType` without a default now has to handle the new variants.
+- `ThreadMember` and `ThreadMemberFlag`. Most of its fields are nullable
+  because the same object arrives with different fields depending on
+  where it appears.
+- `ThreadList`, for listings that return threads and the caller's
+  memberships side by side, and `ForumPost`, a thread plus its first
+  message.
+- `ThreadAutoArchiveDuration`, the four durations the API accepts.
+- `PermissionFlag` gained `manageThreads`, `createPublicThreads`,
+  `createPrivateThreads` and `sendMessagesInThreads`.
+- `MessageType` gained `threadCreated` and `threadStarterMessage`, and
+  `MessageFlag` gained `hasThread` and
+  `failedToMentionSomeRolesInThread`. `Message.thread` holds the thread a
+  message started.
+
 ## 0.3.0
 
 - **Fixed:** `Webhook.token` is now nullable. A channel follower webhook

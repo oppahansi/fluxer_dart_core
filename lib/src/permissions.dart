@@ -1,7 +1,7 @@
 /// The full set of Fluxer guild/channel permission flags, verified against
 /// `packages/constants/src/ChannelConstants.ts` (`export const Permissions`)
 /// in the Fluxer source. Bit positions are not sequential — Fluxer reserves
-/// gaps (e.g. nothing at bit 19, or between 30 and 37) presumably for
+/// gaps (e.g. nothing at bit 19, or between 30 and 34) presumably for
 /// removed or future flags, matching the source exactly rather than
 /// renumbering them.
 enum PermissionFlag {
@@ -35,7 +35,22 @@ enum PermissionFlag {
   manageRoles(1 << 28),
   manageWebhooks(1 << 29),
   manageExpressions(1 << 30),
+
+  /// Archive, lock, rename and delete a thread, view every private
+  /// thread, and act in a locked one.
+  manageThreads(1 << 34),
+
+  /// Start a public thread or an announcement thread.
+  createPublicThreads(1 << 35),
+
+  /// Start a private thread in a text channel.
+  createPrivateThreads(1 << 36),
   useExternalStickers(1 << 37),
+
+  /// Send a message in a thread, and add another member to one. Inside a
+  /// thread this replaces [sendMessages], which is computed for the
+  /// parent channel and then ignored.
+  sendMessagesInThreads(1 << 38),
   moderateMembers(1 << 40),
   createExpressions(1 << 43),
   pinMessages(1 << 51),

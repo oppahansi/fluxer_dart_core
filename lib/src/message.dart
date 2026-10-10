@@ -1,4 +1,5 @@
 import 'attachment.dart';
+import 'channel.dart';
 import 'embed.dart';
 import 'message_reference.dart';
 import 'snowflake.dart';
@@ -25,6 +26,14 @@ enum MessageFlag {
   /// Set on surviving copies once the published message they came from is
   /// deleted. The copy stays in place as a placeholder.
   sourceMessageDeleted(1 << 3),
+
+  /// Set on a message a thread was started from. [Message.thread] holds
+  /// the thread.
+  hasThread(1 << 5),
+
+  /// Set when a role mention in a thread could not add every member of
+  /// the role to the thread.
+  failedToMentionSomeRolesInThread(1 << 8),
 
   /// Deliver the message without a push or desktop notification.
   suppressNotifications(1 << 12),
@@ -72,7 +81,17 @@ enum MessageType {
   /// channel.
   channelFollowAdd(12),
 
-  reply(19);
+  /// Written into the parent channel when a public or announcement
+  /// thread is started. Its [Message.messageReference] names the thread
+  /// as a channel and carries no message id.
+  threadCreated(18),
+
+  reply(19),
+
+  /// The first message of a thread started from a message. It has the
+  /// thread's id, empty content, and the source message as its
+  /// [Message.referencedMessage].
+  threadStarterMessage(21);
 
   const MessageType(this.value);
 
@@ -111,6 +130,7 @@ final class Message {
     this.attachments = const [],
     this.messageReference,
     this.referencedMessage,
+    this.thread,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
@@ -144,6 +164,9 @@ final class Message {
     ),
     referencedMessage: (json['referenced_message'] as Map<String, dynamic>?)
         ?.let(Message.fromJson),
+    thread: (json['thread'] as Map<String, dynamic>?)?.let(
+      ThreadChannel.fromJson,
+    ),
   );
 
   final Snowflake id;
@@ -182,6 +205,10 @@ final class Message {
   /// The full replied-to message, present when Fluxer resolves it inline
   /// rather than leaving the caller to fetch [messageReference] itself.
   final Message? referencedMessage;
+
+  /// The thread started from this message, present while
+  /// [MessageFlag.hasThread] is set. It has this message's id.
+  final ThreadChannel? thread;
 
   bool hasFlag(MessageFlag flag) => flags.has(flag);
 
