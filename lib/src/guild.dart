@@ -43,6 +43,7 @@ final class Guild {
         'id': json['id'],
         'roles': json['roles'],
         'member_count': json['member_count'],
+        'online_count': json['online_count'],
       });
 
   final Snowflake id;

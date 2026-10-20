@@ -12,6 +12,12 @@
   `RATE_LIMITED` dispatch.
 - **Breaking for exhaustive switches:** a `switch` over
   `FluxerException` without a default has to handle the new subtype.
+- `VoiceState`, one voice connection's state. A user can hold several
+  connections, so `connectionId` identifies an entry.
+- `UserPresence.fromJson` takes an optional fallback `user`, for the
+  offline placeholder a member list sends without one.
+- Fixed: `Guild.fromGuildCreateJson` dropped `online_count`, so
+  `Guild.onlineCount` was always `null` from the gateway.
 
 ## 0.4.0
 

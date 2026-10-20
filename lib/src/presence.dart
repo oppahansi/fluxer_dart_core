@@ -135,18 +135,30 @@ final class UserPresence {
     this.guildId,
   });
 
-  factory UserPresence.fromJson(Map<String, dynamic> json) => UserPresence(
-    user: User.fromJson(json['user'] as Map<String, dynamic>),
-    status:
-        PresenceStatus.tryFromValue(json['status'] as String? ?? '') ??
-        PresenceStatus.offline,
-    mobile: json['mobile'] as bool? ?? false,
-    afk: json['afk'] as bool? ?? false,
-    customStatus: (json['custom_status'] as Map<String, dynamic>?)?.let(
-      CustomStatus.fromJson,
-    ),
-    guildId: (json['guild_id'] as String?)?.let(Snowflake.parse),
-  );
+  /// [user] stands in when [json] has none: a member list reports an
+  /// offline member with the placeholder
+  /// `{"status": "offline", "mobile": false, "afk": false}`, leaving the
+  /// user to the member entry it sits in.
+  factory UserPresence.fromJson(Map<String, dynamic> json, {User? user}) =>
+      UserPresence(
+        user: switch (json['user']) {
+          final Map<String, dynamic> u => User.fromJson(u),
+          _ =>
+            user ??
+                (throw const FormatException(
+                  'Presence has no user and none was supplied',
+                )),
+        },
+        status:
+            PresenceStatus.tryFromValue(json['status'] as String? ?? '') ??
+            PresenceStatus.offline,
+        mobile: json['mobile'] as bool? ?? false,
+        afk: json['afk'] as bool? ?? false,
+        customStatus: (json['custom_status'] as Map<String, dynamic>?)?.let(
+          CustomStatus.fromJson,
+        ),
+        guildId: (json['guild_id'] as String?)?.let(Snowflake.parse),
+      );
 
   final User user;
   final PresenceStatus status;

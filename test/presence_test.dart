@@ -86,4 +86,35 @@ void main() {
       expect(GuildRole.fromJson(role(null)).hoistPosition, isNull);
     });
   });
+
+  group('UserPresence.fromJson placeholder', () {
+    const user = User(
+      id: Snowflake(1),
+      username: 'u',
+      discriminator: '0001',
+      globalName: null,
+      avatar: null,
+      avatarColor: null,
+      bot: false,
+      system: false,
+    );
+
+    test('takes the supplied user when the presence has none', () {
+      final presence = UserPresence.fromJson({
+        'status': 'offline',
+        'mobile': false,
+        'afk': false,
+      }, user: user);
+
+      expect(presence.user.id, const Snowflake(1));
+      expect(presence.status, PresenceStatus.offline);
+    });
+
+    test('throws a FormatException with neither', () {
+      expect(
+        () => UserPresence.fromJson({'status': 'offline'}),
+        throwsFormatException,
+      );
+    });
+  });
 }

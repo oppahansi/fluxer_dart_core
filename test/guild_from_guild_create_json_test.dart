@@ -25,6 +25,7 @@ void main() {
           },
         ],
         'member_count': 5,
+        'online_count': 2,
         'channels': <dynamic>[],
         'emojis': <dynamic>[],
         'members': <dynamic>[],
@@ -35,6 +36,7 @@ void main() {
       expect(guild.name, 'Test Guild');
       expect(guild.ownerId, Snowflake.parse('901'));
       expect(guild.memberCount, 5);
+      expect(guild.onlineCount, 2);
       expect(guild.roles, hasLength(1));
     });
 

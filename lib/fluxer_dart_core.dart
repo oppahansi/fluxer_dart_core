@@ -34,4 +34,5 @@ export 'src/reaction_emoji.dart';
 export 'src/snowflake.dart';
 export 'src/thread.dart';
 export 'src/user.dart';
+export 'src/voice_state.dart';
 export 'src/webhook.dart';
