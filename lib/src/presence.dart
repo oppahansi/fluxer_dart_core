@@ -1,4 +1,5 @@
 import 'snowflake.dart';
+import 'user.dart';
 
 /// The availability a session advertises.
 ///
@@ -31,13 +32,20 @@ enum PresenceStatus {
 /// is identified by id, a standard emoji by its Unicode character in
 /// [emojiName].
 final class CustomStatus {
-  const CustomStatus({this.text, this.expiresAt, this.emojiId, this.emojiName});
+  const CustomStatus({
+    this.text,
+    this.expiresAt,
+    this.emojiId,
+    this.emojiName,
+    this.emojiAnimated = false,
+  });
 
   factory CustomStatus.fromJson(Map<String, dynamic> json) => CustomStatus(
     text: json['text'] as String?,
     expiresAt: (json['expires_at'] as String?)?.let(DateTime.parse),
     emojiId: (json['emoji_id'] as String?)?.let(Snowflake.parse),
     emojiName: json['emoji_name'] as String?,
+    emojiAnimated: json['emoji_animated'] as bool? ?? false,
   );
 
   /// 1-128 characters.
@@ -50,6 +58,10 @@ final class CustomStatus {
 
   /// A Unicode emoji character, 1-32 characters.
   final String? emojiName;
+
+  /// Whether the custom emoji named by [emojiId] is animated. Received
+  /// only; Fluxer derives it from the emoji when a status is set.
+  final bool emojiAnimated;
 
   Map<String, dynamic> toJson() => {
     if (text != null) 'text': text,
@@ -105,6 +117,55 @@ final class _ClearingPresence extends Presence {
 
   @override
   Map<String, dynamic> toJson() => {...super.toJson(), 'custom_status': null};
+}
+
+/// Another user's presence as the gateway reports it, in
+/// `PRESENCE_UPDATE` and in member chunks requested with presences.
+///
+/// A published [status] is never [PresenceStatus.invisible]: an invisible
+/// account is reported as [PresenceStatus.offline], and its
+/// [customStatus] is then always `null`.
+final class UserPresence {
+  const UserPresence({
+    required this.user,
+    required this.status,
+    required this.mobile,
+    required this.afk,
+    this.customStatus,
+    this.guildId,
+  });
+
+  factory UserPresence.fromJson(Map<String, dynamic> json) => UserPresence(
+    user: User.fromJson(json['user'] as Map<String, dynamic>),
+    status:
+        PresenceStatus.tryFromValue(json['status'] as String? ?? '') ??
+        PresenceStatus.offline,
+    mobile: json['mobile'] as bool? ?? false,
+    afk: json['afk'] as bool? ?? false,
+    customStatus: (json['custom_status'] as Map<String, dynamic>?)?.let(
+      CustomStatus.fromJson,
+    ),
+    guildId: (json['guild_id'] as String?)?.let(Snowflake.parse),
+  );
+
+  final User user;
+  final PresenceStatus status;
+
+  /// True only while [status] is online and a mobile session set it.
+  final bool mobile;
+
+  /// True when every one of the user's sessions is away; never true
+  /// together with [mobile].
+  final bool afk;
+
+  final CustomStatus? customStatus;
+
+  /// The guild this presence was delivered through, when it came from a
+  /// guild subscription.
+  final Snowflake? guildId;
+
+  @override
+  String toString() => 'UserPresence(${user.id}, ${status.value})';
 }
 
 extension _Let<T> on T {

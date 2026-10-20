@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.0
+
+- `UserPresence`: another user's presence as the gateway reports it,
+  with `CustomStatus` gaining `emojiAnimated`. A published status is
+  never `invisible`; an invisible account is reported as `offline`.
+- `GuildRole.hoistPosition`, set through the hoist-position routes.
+- `Channel.position` and `Channel.parentId`, unified over the variants
+  that carry them, as `Channel.guildId` already was.
+- `FluxerGatewayRateLimitException`, for a gateway command refused by a
+  `RATE_LIMITED` dispatch.
+- **Breaking for exhaustive switches:** a `switch` over
+  `FluxerException` without a default has to handle the new subtype.
+
 ## 0.4.0
 
 - Threads. `ChannelType` gained `announcementThread`, `publicThread` and

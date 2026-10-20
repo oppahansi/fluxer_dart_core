@@ -158,4 +158,45 @@ void main() {
       expect(channel.guildId, Snowflake.parse('222'));
     });
   });
+
+  group('Channel.position and Channel.parentId', () {
+    test('read through the base type for an ordered guild channel', () {
+      final Channel channel = Channel.fromJson({
+        'id': '3',
+        'type': 0,
+        'guild_id': '1',
+        'name': 'general',
+        'position': 4,
+        'parent_id': '2',
+      });
+
+      expect(channel.position, 4);
+      expect(channel.parentId, Snowflake.parse('2'));
+    });
+
+    test('a category has a position but no parent', () {
+      final Channel channel = Channel.fromJson({
+        'id': '2',
+        'type': 4,
+        'guild_id': '1',
+        'name': 'Text Channels',
+        'position': 0,
+      });
+
+      expect(channel.position, 0);
+      expect(channel.parentId, isNull);
+    });
+
+    test('a DM has neither', () {
+      final Channel channel = Channel.fromJson({
+        'id': '1',
+        'type': 1,
+        'recipients': <dynamic>[],
+        'last_message_id': null,
+      });
+
+      expect(channel.position, isNull);
+      expect(channel.parentId, isNull);
+    });
+  });
 }

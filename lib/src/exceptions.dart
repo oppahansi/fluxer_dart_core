@@ -49,3 +49,26 @@ final class FluxerGatewayException extends FluxerException {
   String toString() =>
       'FluxerGatewayException${closeCode != null ? '($closeCode)' : ''}: $message';
 }
+
+/// The gateway refused a command for exceeding its budget, reported by a
+/// `RATE_LIMITED` dispatch. Thrown by `fluxer_dart`.
+///
+/// Only Request Guild Members (opcode 8) is ever refused this way: a bot
+/// may request a guild's full member list once per 30 seconds. Every
+/// other command refusal is silent.
+final class FluxerGatewayRateLimitException extends FluxerException {
+  const FluxerGatewayRateLimitException(
+    super.message, {
+    required this.opcode,
+    required this.retryAfter,
+  });
+
+  /// The refused command's opcode.
+  final int opcode;
+
+  final Duration retryAfter;
+
+  @override
+  String toString() =>
+      'FluxerGatewayRateLimitException(op $opcode, retry after $retryAfter): $message';
+}

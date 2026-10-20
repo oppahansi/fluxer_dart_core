@@ -128,6 +128,34 @@ sealed class Channel {
     DmChannel() || GroupDmChannel() || UnknownChannel() => null,
   };
 
+  /// The sort position among the guild's channels, or `null` for a
+  /// channel kind that is not ordered (a thread, a DM).
+  int? get position => switch (this) {
+    GuildTextChannel(:final position) => position,
+    GuildAnnouncementChannel(:final position) => position,
+    GuildVoiceChannel(:final position) => position,
+    GuildCategoryChannel(:final position) => position,
+    GuildForumChannel(:final position) => position,
+    ThreadChannel() ||
+    DmChannel() ||
+    GroupDmChannel() ||
+    UnknownChannel() => null,
+  };
+
+  /// The category a guild channel sits in, or the channel a thread was
+  /// started in; `null` for a top-level channel, a category, or a DM.
+  Snowflake? get parentId => switch (this) {
+    GuildTextChannel(:final parentId) => parentId,
+    GuildAnnouncementChannel(:final parentId) => parentId,
+    GuildVoiceChannel(:final parentId) => parentId,
+    GuildForumChannel(:final parentId) => parentId,
+    ThreadChannel(:final parentId) => parentId,
+    GuildCategoryChannel() ||
+    DmChannel() ||
+    GroupDmChannel() ||
+    UnknownChannel() => null,
+  };
+
   Map<String, dynamic> toJson();
 }
 
@@ -154,7 +182,9 @@ final class GuildTextChannel extends Channel {
   @override
   final Snowflake guildId;
   final String? topic;
+  @override
   final int position;
+  @override
   final Snowflake? parentId;
   final Snowflake? lastMessageId;
   final bool nsfw;
@@ -200,7 +230,9 @@ final class GuildAnnouncementChannel extends Channel {
   @override
   final Snowflake guildId;
   final String? topic;
+  @override
   final int position;
+  @override
   final Snowflake? parentId;
   final Snowflake? lastMessageId;
   final bool nsfw;
@@ -261,7 +293,9 @@ final class GuildVoiceChannel extends Channel {
 
   @override
   final Snowflake guildId;
+  @override
   final int position;
+  @override
   final Snowflake? parentId;
   final int? bitrate;
   final int? userLimit;
@@ -330,6 +364,7 @@ final class GuildCategoryChannel extends Channel {
 
   @override
   final Snowflake guildId;
+  @override
   final int position;
 
   @override
@@ -373,7 +408,9 @@ final class GuildForumChannel extends Channel {
 
   /// The channel's posting guidelines.
   final String? topic;
+  @override
   final int position;
+  @override
   final Snowflake? parentId;
 
   /// The newest post, sent on the wire as `last_message_id`.
@@ -477,6 +514,7 @@ final class ThreadChannel extends Channel {
   final Snowflake guildId;
 
   /// The text, announcement, forum or media channel the thread is in.
+  @override
   final Snowflake parentId;
 
   /// The user or webhook that created the thread.
