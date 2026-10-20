@@ -101,6 +101,22 @@ sealed class Channel {
             .toList(growable: false),
         defaultThreadRateLimitPerUser:
             json['default_thread_rate_limit_per_user'] as int? ?? 0,
+        defaultSortOrder: ForumSortOrder.tryFromValue(
+          json['default_sort_order'] as int?,
+        ),
+        defaultLayout: ForumLayout.tryFromValue(
+          json['default_forum_layout'] as int?,
+        ),
+        defaultTagSetting: ForumTagSetting.tryFromValue(
+          json['default_tag_setting'] as String?,
+        ),
+        defaultReaction: switch (json['default_reaction_emoji']) {
+          final Map<String, dynamic> r => ForumDefaultReaction.fromJson(r),
+          _ => null,
+        },
+        defaultAutoArchiveDuration: ThreadAutoArchiveDuration.tryFromMinutes(
+          json['default_auto_archive_duration'] as int?,
+        ),
       ),
       ChannelType.announcementThread ||
       ChannelType.publicThread ||
@@ -401,6 +417,11 @@ final class GuildForumChannel extends Channel {
     required this.flags,
     required this.availableTags,
     required this.defaultThreadRateLimitPerUser,
+    this.defaultSortOrder,
+    this.defaultLayout,
+    this.defaultTagSetting,
+    this.defaultReaction,
+    this.defaultAutoArchiveDuration,
   });
 
   @override
@@ -430,6 +451,16 @@ final class GuildForumChannel extends Channel {
   /// request names none.
   final int defaultThreadRateLimitPerUser;
 
+  /// `null` when the channel has none set.
+  final ForumSortOrder? defaultSortOrder;
+  final ForumLayout? defaultLayout;
+  final ForumTagSetting? defaultTagSetting;
+  final ForumDefaultReaction? defaultReaction;
+
+  /// The archive duration a new post inherits when its create request
+  /// names none.
+  final ThreadAutoArchiveDuration? defaultAutoArchiveDuration;
+
   bool get isMedia => type == ChannelType.guildMedia;
 
   /// Whether a new post must apply at least one tag.
@@ -452,6 +483,11 @@ final class GuildForumChannel extends Channel {
     'flags': flags,
     'available_tags': availableTags.map((t) => t.toJson()).toList(),
     'default_thread_rate_limit_per_user': defaultThreadRateLimitPerUser,
+    'default_sort_order': defaultSortOrder?.value,
+    'default_forum_layout': defaultLayout?.value,
+    'default_tag_setting': defaultTagSetting?.value,
+    'default_reaction_emoji': defaultReaction?.toJson(),
+    'default_auto_archive_duration': defaultAutoArchiveDuration?.minutes,
   };
 
   @override

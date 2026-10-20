@@ -1,7 +1,9 @@
 import 'attachment.dart';
 import 'channel.dart';
 import 'embed.dart';
+import 'guild_member.dart';
 import 'message_reference.dart';
+import 'reaction_emoji.dart';
 import 'snowflake.dart';
 import 'user.dart';
 
@@ -131,6 +133,12 @@ final class Message {
     this.messageReference,
     this.referencedMessage,
     this.thread,
+    this.webhookId,
+    this.stickers = const [],
+    this.reactions = const [],
+    this.nonce,
+    this.guildId,
+    this.member,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
@@ -166,6 +174,20 @@ final class Message {
         ?.let(Message.fromJson),
     thread: (json['thread'] as Map<String, dynamic>?)?.let(
       ThreadChannel.fromJson,
+    ),
+    webhookId: (json['webhook_id'] as String?)?.let(Snowflake.parse),
+    stickers: (json['stickers'] as List<dynamic>? ?? const [])
+        .map((s) => MessageSticker.fromJson(s as Map<String, dynamic>))
+        .toList(growable: false),
+    reactions: (json['reactions'] as List<dynamic>? ?? const [])
+        .map((r) => MessageReaction.fromJson(r as Map<String, dynamic>))
+        .toList(growable: false),
+    nonce: json['nonce']?.toString(),
+    guildId: (json['guild_id'] as String?)?.let(Snowflake.parse),
+    // On a gateway message event the member's own `user` is removed;
+    // the account is the message's `author`.
+    member: (json['member'] as Map<String, dynamic>?)?.let(
+      (m) => GuildMember.fromJson({'user': json['author'], ...m}),
     ),
   );
 
@@ -210,6 +232,28 @@ final class Message {
   /// [MessageFlag.hasThread] is set. It has this message's id.
   final ThreadChannel? thread;
 
+  /// The webhook that posted this message; [author] is then a stand-in
+  /// carrying the webhook's name, not a real account.
+  final Snowflake? webhookId;
+
+  final List<MessageSticker> stickers;
+
+  /// Reaction totals per emoji.
+  final List<MessageReaction> reactions;
+
+  /// The value the sender attached to recognise its own message.
+  final String? nonce;
+
+  /// Present on gateway message events in a guild, together with
+  /// [member]; REST responses carry neither.
+  final Snowflake? guildId;
+
+  /// The author's guild member, on gateway message events in a guild.
+  final GuildMember? member;
+
+  /// Whether a webhook, rather than a user or bot account, posted this.
+  bool get isWebhook => webhookId != null;
+
   bool hasFlag(MessageFlag flag) => flags.has(flag);
 
   @override
@@ -227,6 +271,46 @@ extension _Let<T> on T? {
     final self = this;
     return self == null ? null : f(self);
   }
+}
+
+/// A sticker as a message carries it.
+final class MessageSticker {
+  const MessageSticker({
+    required this.id,
+    required this.name,
+    required this.animated,
+  });
+
+  factory MessageSticker.fromJson(Map<String, dynamic> json) => MessageSticker(
+    id: Snowflake.parse(json['id'] as String),
+    name: json['name'] as String,
+    animated: json['animated'] as bool? ?? false,
+  );
+
+  final Snowflake id;
+  final String name;
+  final bool animated;
+}
+
+/// How many times one emoji was reacted to a message, and whether this
+/// bot is one of them.
+final class MessageReaction {
+  const MessageReaction({
+    required this.emoji,
+    required this.count,
+    required this.me,
+  });
+
+  factory MessageReaction.fromJson(Map<String, dynamic> json) =>
+      MessageReaction(
+        emoji: ReactionEmoji.fromJson(json['emoji'] as Map<String, dynamic>),
+        count: json['count'] as int,
+        me: json['me'] as bool? ?? false,
+      );
+
+  final ReactionEmoji emoji;
+  final int count;
+  final bool me;
 }
 
 /// A message together with the time it was pinned.

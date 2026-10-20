@@ -3,14 +3,17 @@
 library;
 
 export 'src/allowed_mentions.dart';
+export 'src/application.dart';
 export 'src/attachment.dart';
 export 'src/attachment_upload.dart';
 export 'src/channel.dart';
 export 'src/channel_follow.dart';
 export 'src/channel_type.dart';
+export 'src/discovery.dart';
 export 'src/effective_permissions.dart';
 export 'src/embed.dart';
 export 'src/exceptions.dart';
+export 'src/expression.dart';
 export 'src/forum.dart';
 export 'src/gateway_bot_info.dart';
 export 'src/guild.dart';
@@ -31,8 +34,10 @@ export 'src/permission_overwrite.dart';
 export 'src/permissions.dart';
 export 'src/presence.dart';
 export 'src/reaction_emoji.dart';
+export 'src/search.dart';
 export 'src/snowflake.dart';
 export 'src/thread.dart';
 export 'src/user.dart';
+export 'src/user_profile.dart';
 export 'src/voice_state.dart';
 export 'src/webhook.dart';

@@ -18,6 +18,25 @@
   offline placeholder a member list sends without one.
 - Fixed: `Guild.fromGuildCreateJson` dropped `online_count`, so
   `Guild.onlineCount` was always `null` from the gateway.
+- `FluxerApiException.fieldErrors` with `FluxerFieldError`: the rejected
+  fields of a `400 INVALID_FORM_BODY`, which previously surfaced only as
+  "Invalid form body."
+- `Message` gained `webhookId` (with `isWebhook`), `stickers`,
+  `reactions`, `nonce`, and on gateway events `guildId` and `member`.
+  The gateway sends that member without its own `user`; it is filled in
+  from `author`.
+- **Breaking:** `Webhook.creator` is nullable. A webhook read through its
+  token carries no creator, and decoding one threw.
+- Search: `MessageSearchResults` (with `indexing` while the index is
+  built), `ThreadSearchResults` (with `retryAfter` when not ready) and
+  `ForumPostData`.
+- Discovery: `DiscoveryCategory`, `DiscoveryGuild`, `DiscoveryGuildPage`,
+  `DiscoveryApplication`, `DiscoveryStatus`.
+- `BotApplication` (the bot's token in that response is not decoded),
+  `UserProfile`, `ExpressionMetadata` and `BulkCreateResult`.
+- Forum defaults: `ForumSortOrder`, `ForumLayout`, `ForumTagSetting`,
+  `ForumDefaultReaction`, and the matching fields on `GuildForumChannel`.
+  `ThreadAutoArchiveDuration.tryFromMinutes`.
 
 ## 0.4.0
 

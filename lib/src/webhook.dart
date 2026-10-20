@@ -47,7 +47,7 @@ final class Webhook {
     name: json['name'] as String,
     avatar: json['avatar'] as String?,
     token: json['token'] as String?,
-    creator: User.fromJson(json['user'] as Map<String, dynamic>),
+    creator: (json['user'] as Map<String, dynamic>?)?.let(User.fromJson),
     type: WebhookType.tryFromValue(json['type'] as int? ?? 1),
     sourceChannel: (json['source_channel'] as Map<String, dynamic>?)?.let(
       PartialChannel.fromJson,
@@ -70,7 +70,10 @@ final class Webhook {
   /// those itself and exposes no token for them.
   final String? token;
 
-  final User creator;
+  /// Who created the webhook. `null` when the webhook was fetched with
+  /// its token rather than by an authenticated caller: the token routes
+  /// omit it.
+  final User? creator;
 
   /// `null` for a type this version does not model.
   final WebhookType? type;

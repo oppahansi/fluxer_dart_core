@@ -18,6 +18,7 @@ final class FluxerApiException extends FluxerException {
     required this.statusCode,
     this.errorCode,
     this.retryAfter,
+    this.fieldErrors = const [],
   });
 
   /// The HTTP status code returned by the API.
@@ -31,9 +32,46 @@ final class FluxerApiException extends FluxerException {
   /// `Retry-After` value (present on `429` responses).
   final Duration? retryAfter;
 
+  /// The fields a `400 INVALID_FORM_BODY` rejected, each with its own
+  /// reason; empty for any other error.
+  final List<FluxerFieldError> fieldErrors;
+
   @override
   String toString() =>
-      'FluxerApiException($statusCode${errorCode != null ? ', $errorCode' : ''}): $message';
+      'FluxerApiException($statusCode${errorCode != null ? ', $errorCode' : ''}): $message'
+      '${fieldErrors.isEmpty ? '' : ' ${fieldErrors.join('; ')}'}';
+}
+
+/// One rejected field of a request body.
+final class FluxerFieldError {
+  const FluxerFieldError({
+    required this.path,
+    required this.message,
+    this.code,
+  });
+
+  /// Decodes the `errors` array of an error response, skipping entries
+  /// that are not objects.
+  static List<FluxerFieldError> listFromJson(Object? errors) => [
+    if (errors is List)
+      for (final e in errors)
+        if (e is Map<String, dynamic>)
+          FluxerFieldError(
+            path: e['path'] as String? ?? '',
+            message: e['message'] as String? ?? '',
+            code: e['code'] as String?,
+          ),
+  ];
+
+  /// Dotted path to the field, with array indexes: `emojis.1.name`.
+  final String path;
+  final String message;
+
+  /// Machine-readable reason, e.g. `STRING_LENGTH_INVALID`.
+  final String? code;
+
+  @override
+  String toString() => '$path: $message';
 }
 
 /// The gateway connection failed or was closed with an error. Thrown by

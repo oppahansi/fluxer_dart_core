@@ -19,6 +19,15 @@ enum ThreadAutoArchiveDuration {
   final int minutes;
 
   Duration get duration => Duration(minutes: minutes);
+
+  /// The duration of [minutes], or `null` for a value the API does not
+  /// accept.
+  static ThreadAutoArchiveDuration? tryFromMinutes(int? minutes) {
+    for (final candidate in values) {
+      if (candidate.minutes == minutes) return candidate;
+    }
+    return null;
+  }
 }
 
 /// The archive and lock state of a thread.

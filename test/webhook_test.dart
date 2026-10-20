@@ -27,6 +27,6 @@ void main() {
     expect(webhook.channelId, Snowflake.parse('3'));
     expect(webhook.name, 'CI Bot');
     expect(webhook.token, 'secret-token');
-    expect(webhook.creator.username, 'oppa');
+    expect(webhook.creator!.username, 'oppa');
   });
 }

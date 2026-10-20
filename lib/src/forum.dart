@@ -17,6 +17,83 @@ enum ChannelFlag {
   final int bit;
 }
 
+/// How a forum lists its posts by default.
+enum ForumSortOrder {
+  latestActivity(0),
+  creationTime(1);
+
+  const ForumSortOrder(this.value);
+
+  final int value;
+
+  static ForumSortOrder? tryFromValue(int? value) {
+    for (final candidate in values) {
+      if (candidate.value == value) return candidate;
+    }
+    return null;
+  }
+}
+
+/// How clients lay a forum's posts out by default. [notSet] leaves it to
+/// the client.
+enum ForumLayout {
+  notSet(0),
+  list(1),
+  grid(2);
+
+  const ForumLayout(this.value);
+
+  final int value;
+
+  static ForumLayout? tryFromValue(int? value) {
+    for (final candidate in values) {
+      if (candidate.value == value) return candidate;
+    }
+    return null;
+  }
+}
+
+/// Whether filtering a forum by several tags matches posts carrying any
+/// of them or all of them.
+enum ForumTagSetting {
+  matchSome('match_some'),
+  matchAll('match_all');
+
+  const ForumTagSetting(this.value);
+
+  final String value;
+
+  static ForumTagSetting? tryFromValue(String? value) {
+    for (final candidate in values) {
+      if (candidate.value == value) return candidate;
+    }
+    return null;
+  }
+}
+
+/// The reaction clients offer on every post of a forum: a custom emoji by
+/// [emojiId], or a Unicode one in [emojiName].
+final class ForumDefaultReaction {
+  const ForumDefaultReaction({this.emojiId, this.emojiName});
+
+  factory ForumDefaultReaction.fromJson(Map<String, dynamic> json) =>
+      ForumDefaultReaction(
+        emojiId: switch (json['emoji_id']) {
+          final String id => Snowflake.parse(id),
+          _ => null,
+        },
+        emojiName: json['emoji_name'] as String?,
+      );
+
+  final Snowflake? emojiId;
+  final String? emojiName;
+
+  Map<String, dynamic> toJson() => {
+    'emoji_id': emojiId?.toJson(),
+    'emoji_name': emojiName,
+  };
+}
+
 /// A tag a post in a forum or media channel can apply.
 ///
 /// At most one of [emojiId] and [emojiName] is set.
