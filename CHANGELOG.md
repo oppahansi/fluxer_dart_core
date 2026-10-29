@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.6.0
 
 - `ProfileBadge` and `ProfileBadgeDetails`, with `UserProfile.badges`,
   `UserProfile.operatorPassSince` and `UserProfile.hiddenBadgeCount`
