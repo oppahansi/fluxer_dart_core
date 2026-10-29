@@ -1,3 +1,5 @@
+import 'snowflake.dart';
+
 /// The endpoint URLs a deployment publishes for itself.
 ///
 /// A deployment may put each service on its own hostname or serve them
@@ -63,6 +65,87 @@ final class InstanceEndpoints {
   String toString() => 'InstanceEndpoints($apiPublic)';
 }
 
+/// A custom badge a deployment's guilds can show next to their name,
+/// listed in the discovery document and referenced by `Guild.badgeIds`.
+final class InstanceGuildBadge {
+  const InstanceGuildBadge({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.assetUrl,
+    required this.href,
+  });
+
+  factory InstanceGuildBadge.fromJson(Map<String, dynamic> json) =>
+      InstanceGuildBadge(
+        id: Snowflake.parse(json['id'] as String),
+        name: json['name'] as String,
+        description: json['description'] as String?,
+        assetUrl: Uri.parse(json['asset_url'] as String),
+        href: switch (json['href']) {
+          final String s => Uri.parse(s),
+          _ => null,
+        },
+      );
+
+  final Snowflake id;
+  final String name;
+
+  /// Text shown under the name on hover.
+  final String? description;
+
+  /// The badge image, served as WebP by the media proxy.
+  final Uri assetUrl;
+
+  /// Where a click on the badge leads.
+  final Uri? href;
+
+  @override
+  String toString() => 'InstanceGuildBadge($id, $name)';
+}
+
+/// A notice the deployment's administrator shows everyone, such as planned
+/// maintenance.
+final class InstanceNotice {
+  const InstanceNotice({
+    required this.id,
+    required this.message,
+    required this.url,
+    required this.startsAt,
+    required this.endsAt,
+  });
+
+  factory InstanceNotice.fromJson(Map<String, dynamic> json) => InstanceNotice(
+    id: json['id'] as String,
+    message: json['message'] as String,
+    url: json['url'] as String?,
+    startsAt: switch (json['starts_at']) {
+      final String s => DateTime.parse(s),
+      _ => null,
+    },
+    endsAt: switch (json['ends_at']) {
+      final String s => DateTime.parse(s),
+      _ => null,
+    },
+  );
+
+  /// Changes whenever the text changes.
+  final String id;
+  final String message;
+
+  /// An optional link shown with the notice.
+  final String? url;
+
+  /// When the notice starts showing; `null` means already.
+  final DateTime? startsAt;
+
+  /// When it stops showing; `null` means it does not end.
+  final DateTime? endsAt;
+
+  @override
+  String toString() => 'InstanceNotice($id)';
+}
+
 /// A deployment's self-description, served unauthenticated from
 /// `/.well-known/fluxer`.
 ///
@@ -76,10 +159,20 @@ final class InstanceDiscovery {
     required this.features,
     required this.limits,
     required this.raw,
+    this.guildBadges = const [],
+    this.notice,
   });
 
   factory InstanceDiscovery.fromJson(Map<String, dynamic> json) =>
       InstanceDiscovery(
+        guildBadges: [
+          for (final b in json['guild_badges'] as List<dynamic>? ?? const [])
+            InstanceGuildBadge.fromJson(b as Map<String, dynamic>),
+        ],
+        notice: switch (json['notice']) {
+          final Map<String, dynamic> n => InstanceNotice.fromJson(n),
+          _ => null,
+        },
         apiCodeVersion: json['api_code_version'] as int?,
         endpoints: InstanceEndpoints.fromJson(
           json['endpoints'] as Map<String, dynamic>? ?? const {},
@@ -101,11 +194,25 @@ final class InstanceDiscovery {
   /// Deployment-configured ceilings, such as upload sizes.
   final Map<String, dynamic> limits;
 
+  /// The custom guild badges guilds on this deployment can show, in display
+  /// order.
+  final List<InstanceGuildBadge> guildBadges;
+
+  /// The administrator's notice, or `null` when there is none.
+  final InstanceNotice? notice;
+
   /// The undecoded document.
   final Map<String, dynamic> raw;
 
   /// Whether [name] is present and enabled in [features].
   bool hasFeature(String name) => features[name] == true;
+
+  /// The entries of [guildBadges] named by [ids], in the order of [ids].
+  /// An id the document does not list is skipped.
+  List<InstanceGuildBadge> resolveGuildBadges(Iterable<Snowflake> ids) {
+    final byId = {for (final b in guildBadges) b.id: b};
+    return [for (final id in ids) ?byId[id]];
+  }
 
   @override
   String toString() => 'InstanceDiscovery(${endpoints.apiPublic})';

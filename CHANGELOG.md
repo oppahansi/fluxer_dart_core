@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- `ProfileBadge` and `ProfileBadgeDetails`, with `UserProfile.badges`,
+  `UserProfile.operatorPassSince` and `UserProfile.hiddenBadgeCount`
+  (present only on the requesting account's own profile).
+- `Guild.badgeIds`, `Invite.guildBadgeIds` and `DiscoveryGuild.badgeIds`:
+  the ids of a guild's custom badges.
+- `InstanceDiscovery.guildBadges` (`InstanceGuildBadge`),
+  `InstanceDiscovery.notice` (`InstanceNotice`) and
+  `InstanceDiscovery.resolveGuildBadges`, which looks badge ids up and
+  skips any the document does not list.
+
 ## 0.5.0
 
 - `UserPresence`: another user's presence as the gateway reports it,

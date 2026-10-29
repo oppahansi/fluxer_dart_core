@@ -17,6 +17,7 @@ final class Invite {
     required this.presenceCount,
     required this.expiresAt,
     required this.temporary,
+    this.guildBadgeIds = const [],
   });
 
   factory Invite.fromJson(Map<String, dynamic> json) {
@@ -33,6 +34,10 @@ final class Invite {
       presenceCount: json['presence_count'] as int,
       expiresAt: (json['expires_at'] as String?)?.let(DateTime.parse),
       temporary: json['temporary'] as bool,
+      guildBadgeIds: [
+        for (final id in guild?['badge_ids'] as List<dynamic>? ?? const [])
+          Snowflake.parse(id as String),
+      ],
     );
   }
 
@@ -48,6 +53,9 @@ final class Invite {
   /// `null` means this invite never expires.
   final DateTime? expiresAt;
   final bool temporary;
+
+  /// The custom badge ids of the invite's guild; see `Guild.badgeIds`.
+  final List<Snowflake> guildBadgeIds;
 
   @override
   bool operator ==(Object other) => other is Invite && other.code == code;

@@ -27,6 +27,7 @@ final class DiscoveryGuild {
     required this.memberCount,
     required this.onlineCount,
     required this.features,
+    this.badgeIds = const [],
   });
 
   factory DiscoveryGuild.fromJson(Map<String, dynamic> json) => DiscoveryGuild(
@@ -44,6 +45,10 @@ final class DiscoveryGuild {
     features: (json['features'] as List<dynamic>? ?? const [])
         .cast<String>()
         .toList(growable: false),
+    badgeIds: [
+      for (final id in json['badge_ids'] as List<dynamic>? ?? const [])
+        Snowflake.parse(id as String),
+    ],
   );
 
   final Snowflake id;
@@ -58,6 +63,9 @@ final class DiscoveryGuild {
   final int memberCount;
   final int onlineCount;
   final List<String> features;
+
+  /// The custom badge ids of the guild; see `Guild.badgeIds`.
+  final List<Snowflake> badgeIds;
 
   @override
   String toString() => 'DiscoveryGuild($id, $name)';

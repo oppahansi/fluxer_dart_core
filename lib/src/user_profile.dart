@@ -1,4 +1,5 @@
 import 'guild_member.dart';
+import 'profile_badge.dart';
 import 'snowflake.dart';
 import 'user.dart';
 
@@ -19,6 +20,9 @@ final class UserProfile {
     this.guildBio,
     this.guildPronouns,
     this.mutualGuilds = const [],
+    this.badges = const [],
+    this.operatorPassSince,
+    this.hiddenBadgeCount,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -44,6 +48,15 @@ final class UserProfile {
             nick: g['nick'] as String?,
           ),
       ],
+      badges: [
+        for (final b in json['profile_badges'] as List<dynamic>? ?? const [])
+          ProfileBadge.fromJson(b as Map<String, dynamic>),
+      ],
+      operatorPassSince: switch (json['operator_pass_since']) {
+        final String s => DateTime.parse(s),
+        _ => null,
+      },
+      hiddenBadgeCount: json['hidden_profile_badge_count'] as int?,
     );
   }
 
@@ -66,6 +79,18 @@ final class UserProfile {
   /// Guilds this bot shares with the user, with the user's nickname in
   /// each.
   final List<({Snowflake id, String? nick})> mutualGuilds;
+
+  /// The badges to display, in display order. Empty when there is nothing
+  /// to show.
+  final List<ProfileBadge> badges;
+
+  /// When the user got the Operator Pass; `null` when they have none or
+  /// hide it.
+  final DateTime? operatorPassSince;
+
+  /// How many of the user's badges are hidden from other people. Present
+  /// only on the requesting account's own profile.
+  final int? hiddenBadgeCount;
 
   @override
   String toString() => 'UserProfile(${user.id})';

@@ -33,6 +33,7 @@ export 'src/partial.dart';
 export 'src/permission_overwrite.dart';
 export 'src/permissions.dart';
 export 'src/presence.dart';
+export 'src/profile_badge.dart';
 export 'src/reaction_emoji.dart';
 export 'src/search.dart';
 export 'src/snowflake.dart';

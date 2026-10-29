@@ -15,6 +15,7 @@ final class Guild {
     required this.memberCount,
     required this.onlineCount,
     required this.vanityUrlCode,
+    this.badgeIds = const [],
   });
 
   /// Decodes the flat shape REST returns (`GuildResponse`): guild fields
@@ -30,6 +31,10 @@ final class Guild {
     memberCount: json['member_count'] as int?,
     onlineCount: json['online_count'] as int?,
     vanityUrlCode: json['vanity_url_code'] as String?,
+    badgeIds: [
+      for (final id in json['badge_ids'] as List<dynamic>? ?? const [])
+        Snowflake.parse(id as String),
+    ],
   );
 
   /// Decodes the `GUILD_CREATE`/READY gateway dispatch shape
@@ -57,6 +62,11 @@ final class Guild {
   /// The guild's custom invite code (`fluxer.app/i/<code>`), if the
   /// `VANITY_URL` feature is enabled — `null` otherwise.
   final String? vanityUrlCode;
+
+  /// The ids of the instance's custom guild badges assigned to this guild,
+  /// at most 10. Resolve them against `InstanceDiscovery.guildBadges`; an
+  /// id with no entry there is skipped.
+  final List<Snowflake> badgeIds;
 
   @override
   bool operator ==(Object other) => other is Guild && other.id == id;
