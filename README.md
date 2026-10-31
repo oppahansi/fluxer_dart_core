@@ -1,5 +1,7 @@
 # fluxer_dart_core
 
+[![Discord](https://img.shields.io/static/v1?logo=discord&label=discord&message=Join&color=blue)](https://discord.gg/ncKmDEArqg)
+
 Domain models, enums, the `Snowflake` ID type, the `Permissions` bitfield,
 and the shared exception hierarchy for the
 [fluxer_dart](https://github.com/oppahansi/fluxer_dart) ecosystem.
